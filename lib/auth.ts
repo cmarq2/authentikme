@@ -28,6 +28,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name ?? undefined,
           role: user.role,
+          company: user.company ?? undefined,
           emailVerified: user.emailVerified,
           totpEnabled: user.totpEnabled,
         }
@@ -39,6 +40,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = (user as any).role
+        token.company = (user as any).company
         token.emailVerified = (user as any).emailVerified
         token.totpEnabled = (user as any).totpEnabled
       }
@@ -52,6 +54,7 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
+        ;(session.user as any).company = token.company as string | undefined
         session.user.emailVerified = token.emailVerified as boolean
         session.user.totpEnabled = token.totpEnabled as boolean
       }
