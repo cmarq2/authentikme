@@ -26,8 +26,15 @@ export default function CandidateDashboard() {
 }
 
 function Spinner({ full }: { full?: boolean }) {
-  const el = <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-  return full ? <div className="min-h-screen flex items-center justify-center bg-gray-50">{el}</div> : el
+  const el = (
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+      <span className="text-sm text-slate-400 font-medium">Loading…</span>
+    </div>
+  )
+  return full ? (
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">{el}</div>
+  ) : el
 }
 
 function DashboardInner() {
@@ -78,8 +85,7 @@ function DashboardInner() {
   }, [paymentResult])
 
   async function handlePay() {
-    setPaymentLoading(true)
-    setPaymentError("")
+    setPaymentLoading(true); setPaymentError("")
     try {
       const res = await fetch("/api/candidate/create-checkout", { method: "POST" })
       const data = await res.json()
@@ -97,8 +103,7 @@ function DashboardInner() {
     if (!token) return
     setCaptchaError("")
     const res = await fetch("/api/candidate/recaptcha", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ recaptchaToken: token }),
     })
     const data = await res.json()
@@ -115,12 +120,9 @@ function DashboardInner() {
   }
 
   async function verifyTotp(e: React.FormEvent) {
-    e.preventDefault()
-    setTotpError("")
-    setTotpLoading(true)
+    e.preventDefault(); setTotpError(""); setTotpLoading(true)
     const res = await fetch("/api/candidate/verify-totp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: totpToken }),
     })
     const data = await res.json()
@@ -151,28 +153,25 @@ function DashboardInner() {
 
   const navItems: { id: Tab; label: string; icon: React.ReactNode }[] = [
     {
-      id: "overview",
-      label: "Overview",
+      id: "overview", label: "Overview",
       icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         </svg>
       ),
     },
     {
-      id: "verification",
-      label: "Verification",
+      id: "verification", label: "Verification",
       icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
     },
     {
-      id: "settings",
-      label: "Settings",
+      id: "settings", label: "Settings",
       icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
@@ -181,59 +180,66 @@ function DashboardInner() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Top header */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4 shrink-0 z-20 relative">
+    <div className="min-h-screen bg-slate-950 flex flex-col">
+
+      {/* ── Header ── */}
+      <header className="bg-slate-900 border-b border-slate-800 px-6 py-4 shrink-0 z-20 relative">
         <div className="flex items-center justify-between max-w-screen-xl mx-auto">
-          <Link href="/" className="text-xl font-bold text-blue-900">
-            Authentik<span className="text-blue-500">Me</span>
+          <Link href="/" className="text-xl font-bold text-white tracking-tight">
+            Authentik<span className="text-blue-400">Me</span>
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold select-none">
+            <span className="text-xs text-slate-500 hidden sm:block">{userStatus.email}</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold select-none ring-2 ring-blue-500/30">
               {(userStatus.name ?? userStatus.email)[0].toUpperCase()}
             </div>
-            <span className="text-sm text-gray-700 font-medium hidden sm:block">
-              {userStatus.name ?? userStatus.email}
-            </span>
           </div>
         </div>
       </header>
 
       <div className="flex flex-1 max-w-screen-xl mx-auto w-full">
-        {/* Sidebar — desktop only */}
-        <aside className="w-56 shrink-0 border-r border-gray-100 bg-white hidden md:flex flex-col py-6 px-3">
+
+        {/* ── Sidebar (desktop) ── */}
+        <aside className="w-60 shrink-0 bg-slate-900 border-r border-slate-800 hidden md:flex flex-col py-6 px-3">
+          <div className="px-2 mb-2">
+            <p className="text-xs font-semibold text-slate-600 uppercase tracking-widest">Navigation</p>
+          </div>
           <nav className="flex flex-col gap-1">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
-                  activeTab === item.id
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-              >
-                {item.icon}
-                {item.label}
-                {item.id === "verification" && !allDone && (
-                  <span className="ml-auto text-xs font-semibold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">
-                    {completedCount}/{steps.length}
-                  </span>
-                )}
-                {item.id === "verification" && allDone && (
-                  <svg className="w-4 h-4 text-green-500 ml-auto shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </button>
-            ))}
+            {navItems.map((item) => {
+              const isActive = activeTab === item.id
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-left ${
+                    isActive
+                      ? "text-blue-300 sidebar-item-active"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800"
+                  }`}
+                >
+                  {item.icon}
+                  {item.label}
+                  {item.id === "verification" && !allDone && (
+                    <span className="ml-auto text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded-full">
+                      {completedCount}/{steps.length}
+                    </span>
+                  )}
+                  {item.id === "verification" && allDone && (
+                    <svg className="w-4 h-4 text-emerald-400 ml-auto shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              )
+            })}
           </nav>
-          <div className="mt-auto pt-4 border-t border-gray-100">
+
+          <div className="mt-auto pt-4 border-t border-slate-800">
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all w-full"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all w-full"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               Sign out
@@ -241,8 +247,11 @@ function DashboardInner() {
           </div>
         </aside>
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-8 pb-24 md:pb-8">
+        {/* ── Main content ── */}
+        <main
+          className="flex-1 overflow-y-auto px-4 sm:px-10 py-8 pb-24 md:pb-10"
+          style={{ background: "linear-gradient(135deg, #f8fafc 0%, #f0f4ff 50%, #f5f8ff 100%)" }}
+        >
           {activeTab === "overview" && (
             <OverviewTab
               userStatus={userStatus}
@@ -285,20 +294,23 @@ function DashboardInner() {
         </main>
       </div>
 
-      {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex z-10">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
-              activeTab === item.id ? "text-blue-600" : "text-gray-500"
-            }`}
-          >
-            {item.icon}
-            {item.label}
-          </button>
-        ))}
+      {/* ── Mobile bottom nav ── */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 flex z-10">
+        {navItems.map((item) => {
+          const isActive = activeTab === item.id
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
+                isActive ? "text-blue-400" : "text-slate-500"
+              }`}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
@@ -319,120 +331,223 @@ function OverviewTab({
   onGoToVerification: () => void
 }) {
   const firstName = userStatus.name?.split(" ")[0] ?? "there"
-  const r = 15.9
+  const r = 42
   const circumference = 2 * Math.PI * r
+
+  const [ringPct, setRingPct] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => setRingPct(progressPct), 250)
+    return () => clearTimeout(t)
+  }, [progressPct])
+
+  const stepIcons: Record<string, React.ReactNode> = {
+    email: (
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    ),
+    payment: (
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+      </svg>
+    ),
+    captcha: (
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+    totp: (
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    ),
+  }
 
   return (
     <div className="max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back, {firstName}</h1>
-        <p className="text-sm text-gray-500 mt-1">Here&apos;s your identity verification overview.</p>
+
+      {/* Welcome */}
+      <div className="mb-8 dash-enter">
+        <div className="flex items-center gap-3 mb-1">
+          <h1 className="text-3xl font-bold text-slate-900">Welcome back, {firstName}</h1>
+          {allDone && (
+            <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Fully Verified
+            </span>
+          )}
+        </div>
+        <p className="text-slate-500 text-sm">Here&apos;s your identity verification overview.</p>
       </div>
 
       {/* Verification status card */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-4">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-5">Verification Status</p>
-        <div className="flex items-center gap-6 mb-6">
-          {/* Circular progress ring */}
-          <div className="relative w-20 h-20 shrink-0">
-            <svg viewBox="0 0 36 36" className="w-20 h-20">
-              <circle cx="18" cy="18" r={r} fill="none" stroke="#f3f4f6" strokeWidth="3" />
-              <circle
-                cx="18" cy="18" r={r} fill="none"
-                stroke={allDone ? "#22c55e" : "#2563eb"}
-                strokeWidth="3"
-                strokeDasharray={circumference}
-                strokeDashoffset={circumference * (1 - progressPct / 100)}
-                strokeLinecap="round"
-                transform="rotate(-90 18 18)"
-                style={{ transition: "stroke-dashoffset 0.7s ease" }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className={`text-lg font-bold ${allDone ? "text-green-600" : "text-blue-600"}`}>{progressPct}%</span>
+      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 mb-5 dash-enter dash-delay-1 card-hover" style={{ transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease" }}>
+        {/* Accent bar */}
+        <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
+        <div className="p-6">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Verification Status</p>
+          <div className="flex items-center gap-8 mb-6">
+            {/* Animated ring */}
+            <div className={`relative shrink-0 ${allDone ? "ring-glow-green" : "ring-glow-blue"}`}>
+              <svg viewBox="0 0 100 100" className="w-28 h-28">
+                {/* Track */}
+                <circle cx="50" cy="50" r={r} fill="none" stroke="#f1f5f9" strokeWidth="7" />
+                {/* Progress */}
+                <circle
+                  cx="50" cy="50" r={r} fill="none"
+                  stroke={allDone ? "url(#greenGrad)" : "url(#blueGrad)"}
+                  strokeWidth="7"
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={circumference * (1 - ringPct / 100)}
+                  transform="rotate(-90 50 50)"
+                  style={{ transition: "stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
+                />
+                <defs>
+                  <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#6366f1" />
+                  </linearGradient>
+                  <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#22c55e" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className={`text-2xl font-bold tabular-nums ${allDone ? "text-emerald-600" : "text-blue-600"}`}>
+                  {ringPct}%
+                </span>
+                <span className="text-xs text-slate-400 font-medium">{completedCount}/{steps.length}</span>
+              </div>
             </div>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900 text-base">
-              {allDone ? "Fully Verified" : `${completedCount} of ${steps.length} steps complete`}
-            </p>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {allDone
-                ? "All steps done. Your code is ready to share."
-                : "Complete the remaining steps to get your code."}
-            </p>
-            {!allDone && (
-              <button
-                onClick={onGoToVerification}
-                className="mt-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                Continue verification →
-              </button>
-            )}
-          </div>
-        </div>
 
-        {/* Step status pills */}
-        <div className="grid grid-cols-2 gap-2">
-          {steps.map((s) => (
-            <div
-              key={s.key}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
-                s.done ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-400"
-              }`}
-            >
-              {s.done ? (
-                <svg className="w-4 h-4 shrink-0 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                <div className="w-4 h-4 rounded-full border-2 border-gray-300 shrink-0" />
+            <div className="flex-1">
+              <p className="text-lg font-bold text-slate-900 mb-1">
+                {allDone ? "Identity Verified" : `${steps.length - completedCount} step${steps.length - completedCount !== 1 ? "s" : ""} remaining`}
+              </p>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                {allDone
+                  ? "All checks passed. Your verification code is ready to share with employers."
+                  : "Complete the remaining steps to unlock your unique verification code."}
+              </p>
+              {!allDone && (
+                <button
+                  onClick={onGoToVerification}
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors group"
+                >
+                  Continue verification
+                  <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               )}
-              {s.label}
             </div>
-          ))}
+          </div>
+
+          {/* Step pills */}
+          <div className="grid grid-cols-2 gap-2">
+            {steps.map((s) => (
+              <div
+                key={s.key}
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
+                  s.done
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                    : "bg-slate-50 text-slate-400 border-slate-100"
+                }`}
+              >
+                <div className={`shrink-0 ${s.done ? "text-emerald-500" : "text-slate-300"}`}>
+                  {s.done ? (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  ) : stepIcons[s.key]}
+                </div>
+                {s.label}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Verification code */}
       {allDone && userStatus.verificationCode ? (
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg">
-          <div className="flex items-center gap-2 mb-1">
-            <svg className="w-4 h-4 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-            </svg>
-            <span className="text-sm font-semibold text-blue-100">Your Verification Code</span>
-          </div>
-          <p className="text-blue-200 text-xs mb-4">Share this with employers to prove your identity is verified.</p>
-          <div className="flex items-center gap-3">
-            <div className="flex-1 bg-white/10 backdrop-blur rounded-xl px-5 py-3">
-              <span className="text-2xl font-mono font-bold tracking-widest">{userStatus.verificationCode}</span>
+        <div className="shimmer-sweep code-card-glow rounded-2xl overflow-hidden dash-enter dash-delay-2"
+          style={{ background: "linear-gradient(135deg, #1d4ed8 0%, #4338ca 50%, #6d28d9 100%)" }}>
+          <div className="p-6">
+            {/* Header */}
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+              </div>
+              <span className="text-white font-semibold text-sm">Your Verification Code</span>
             </div>
+            <p className="text-blue-200/80 text-xs mb-5 ml-9">Share this with any employer to prove your identity is verified.</p>
+
+            {/* Code display */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 border border-white/10">
+              <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-2">Identity Code</p>
+              <span className="text-3xl font-mono font-bold tracking-[0.3em] text-white">
+                {userStatus.verificationCode}
+              </span>
+            </div>
+
             <button
               onClick={copyCode}
-              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
-                copied ? "bg-green-400 text-white" : "bg-white text-blue-700 hover:bg-blue-50"
+              className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all ${
+                copied
+                  ? "bg-emerald-400 text-white"
+                  : "bg-white text-indigo-700 hover:bg-blue-50"
               }`}
+              style={{ transition: "background 0.2s ease, transform 0.15s ease" }}
             >
-              {copied ? "Copied!" : "Copy"}
+              {copied ? (
+                <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> Copied to clipboard</>
+              ) : (
+                <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> Copy Code</>
+              )}
             </button>
           </div>
         </div>
       ) : !allDone ? (
-        <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-8 text-center">
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-            </svg>
+        <div className="relative bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm dash-enter dash-delay-2 group">
+          {/* Blurred preview */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden>
+            <span className="text-5xl font-mono font-bold tracking-[0.35em] text-slate-100 blur-sm">
+              XXXX-XXXX
+            </span>
           </div>
-          <p className="text-sm font-medium text-gray-700">Verification code not yet available</p>
-          <p className="text-xs text-gray-400 mt-1 mb-4">Complete all verification steps to unlock your code.</p>
-          <button
-            onClick={onGoToVerification}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
-          >
-            Continue Verification
-          </button>
+
+          {/* Overlay content */}
+          <div className="relative p-8 flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-300">
+              <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <p className="text-base font-bold text-slate-800 mb-1">Verification code locked</p>
+            <p className="text-sm text-slate-500 mb-1">
+              {steps.length - completedCount} step{steps.length - completedCount !== 1 ? "s" : ""} remaining to unlock your code
+            </p>
+            <div className="flex gap-1 mb-5 mt-1">
+              {steps.map((s) => (
+                <div key={s.key} className={`h-1 w-8 rounded-full transition-colors ${s.done ? "bg-blue-500" : "bg-slate-200"}`} />
+              ))}
+            </div>
+            <button
+              onClick={onGoToVerification}
+              className="btn-shimmer inline-flex items-center gap-2 text-white text-sm font-semibold px-6 py-2.5 rounded-xl"
+            >
+              Continue Verification
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       ) : null}
     </div>
@@ -470,67 +585,75 @@ function VerificationTab({
 }) {
   return (
     <div className="max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Verification Steps</h1>
-        <p className="text-sm text-gray-500 mt-1">Complete each step to earn your AuthentikMe verification code.</p>
+      <div className="mb-8 dash-enter">
+        <h1 className="text-3xl font-bold text-slate-900">Verification Steps</h1>
+        <p className="text-slate-500 text-sm mt-1">Complete each step to earn your AuthentikMe verification code.</p>
       </div>
 
-      {/* Payment banners */}
+      {/* Banners */}
       {paymentResult === "success" && !userStatus.stripePaid && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 mb-6 flex items-center gap-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 mb-6 flex items-center gap-3 dash-enter">
           <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin shrink-0" />
-          <p className="text-sm text-blue-800 font-medium">Payment received — confirming your payment…</p>
+          <p className="text-sm text-blue-800 font-medium">Payment received — confirming…</p>
         </div>
       )}
       {paymentResult === "cancelled" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6 dash-enter">
           <p className="text-sm text-amber-800 font-medium">Payment was cancelled. You can try again below.</p>
         </div>
       )}
 
-      {/* Verification code — shown once complete */}
+      {/* Code card when done */}
       {allDone && userStatus.verificationCode && (
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 mb-6 text-white shadow-lg">
-          <div className="flex items-center gap-2 mb-1">
-            <svg className="w-5 h-5 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span className="text-sm font-semibold text-blue-100">Identity Fully Verified</span>
-          </div>
-          <p className="text-blue-200 text-xs mb-4">Share this code with any employer to prove your identity.</p>
-          <div className="flex items-center gap-3">
-            <div className="flex-1 bg-white/10 backdrop-blur rounded-xl px-5 py-3">
-              <span className="text-2xl font-mono font-bold tracking-widest">{userStatus.verificationCode}</span>
+        <div className="shimmer-sweep code-card-glow rounded-2xl overflow-hidden mb-6 dash-enter"
+          style={{ background: "linear-gradient(135deg, #1d4ed8 0%, #4338ca 50%, #6d28d9 100%)" }}>
+          <div className="p-6">
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <span className="text-white font-semibold text-sm">Identity Fully Verified</span>
             </div>
-            <button
-              onClick={copyCode}
-              className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
-                copied ? "bg-green-400 text-white" : "bg-white text-blue-700 hover:bg-blue-50"
-              }`}
-            >
-              {copied ? "Copied!" : "Copy"}
-            </button>
+            <p className="text-blue-200/80 text-xs mb-4 ml-9">Share this code with any employer to prove your identity.</p>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 bg-white/10 backdrop-blur rounded-xl px-5 py-3 border border-white/10">
+                <span className="text-2xl font-mono font-bold tracking-widest text-white">{userStatus.verificationCode}</span>
+              </div>
+              <button
+                onClick={copyCode}
+                className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
+                  copied ? "bg-emerald-400 text-white" : "bg-white text-indigo-700 hover:bg-blue-50"
+                }`}
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Steps */}
-      <div className="space-y-4">
-        <StepCard number={1} title="Verify your email address" description="Confirm your email to prove it belongs to you." done={userStatus.emailVerified}>
+      <div className="space-y-3">
+        <PremiumStepCard number={1} title="Verify your email address" description="Confirm your email to prove it belongs to you." done={userStatus.emailVerified} delay="dash-delay-1">
           {!userStatus.emailVerified && (
-            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-              Check your inbox for a verification email and click the link inside.
-            </p>
+            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-sm text-amber-800 font-medium">Check your inbox for a verification email and click the link inside.</p>
+            </div>
           )}
-        </StepCard>
+        </PremiumStepCard>
 
-        <StepCard number={2} title="Pay verification fee" description="A one-time $4.99 fee covers the cost of your identity verification." done={userStatus.stripePaid} locked={!userStatus.emailVerified}>
+        <PremiumStepCard number={2} title="Pay verification fee" description="A one-time $4.99 fee covers the cost of your identity verification." done={userStatus.stripePaid} locked={!userStatus.emailVerified} delay="dash-delay-2">
           {!userStatus.stripePaid && userStatus.emailVerified && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               <button
                 onClick={onPay}
                 disabled={paymentLoading}
-                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors disabled:opacity-60 text-sm"
+                className="w-full flex items-center justify-center gap-2 btn-shimmer text-white font-semibold py-3 px-6 rounded-xl disabled:opacity-60 text-sm"
               >
                 {paymentLoading ? (
                   <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Redirecting to payment…</>
@@ -538,29 +661,29 @@ function VerificationTab({
                   <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Pay $4.99 with Stripe</>
                 )}
               </button>
-              {paymentError && <p className="text-sm text-red-600 text-center">{paymentError}</p>}
+              {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
             </div>
           )}
-        </StepCard>
+        </PremiumStepCard>
 
-        <StepCard number={3} title="Human verification" description="Complete a quick reCAPTCHA challenge to confirm you're not a bot." done={userStatus.recaptchaDone} locked={!userStatus.stripePaid}>
+        <PremiumStepCard number={3} title="Human verification" description="Complete a quick reCAPTCHA to confirm you're not a bot." done={userStatus.recaptchaDone} locked={!userStatus.stripePaid} delay="dash-delay-3">
           {!userStatus.recaptchaDone && userStatus.stripePaid && (
             <div>
               {captchaError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">{captchaError}</div>
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl mb-3">{captchaError}</div>
               )}
               <div className="flex justify-center">
                 <ReCAPTCHA ref={recaptchaRef} sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} onChange={onCaptcha} />
               </div>
             </div>
           )}
-        </StepCard>
+        </PremiumStepCard>
 
-        <StepCard number={4} title="Set up Google Authenticator" description="Add two-factor authentication for maximum identity security." done={userStatus.totpEnabled} locked={!userStatus.recaptchaDone}>
+        <PremiumStepCard number={4} title="Set up Google Authenticator" description="Add two-factor authentication for maximum identity security." done={userStatus.totpEnabled} locked={!userStatus.recaptchaDone} delay="dash-delay-4">
           {!userStatus.totpEnabled && userStatus.recaptchaDone && (
             <div>
               {totpStep === "idle" && (
-                <button onClick={onStartTotp} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
+                <button onClick={onStartTotp} className="w-full btn-shimmer text-white font-semibold py-3 rounded-xl text-sm">
                   Generate QR Code
                 </button>
               )}
@@ -568,9 +691,11 @@ function VerificationTab({
                 <div className="text-center">
                   {qrCode ? (
                     <>
-                      <p className="text-sm text-gray-600 mb-4">Open <strong>Google Authenticator</strong> → tap <strong>+</strong> → <strong>Scan a QR code</strong></p>
-                      <img src={qrCode} alt="TOTP QR Code" className="mx-auto mb-4 border border-gray-200 rounded-xl" width={180} />
-                      <button onClick={() => setTotpStep("verify")} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
+                      <p className="text-sm text-slate-600 mb-4">Open <strong>Google Authenticator</strong> → tap <strong>+</strong> → <strong>Scan a QR code</strong></p>
+                      <div className="inline-block p-3 bg-white border border-slate-200 rounded-2xl shadow-sm mb-4">
+                        <img src={qrCode} alt="TOTP QR Code" width={160} />
+                      </div>
+                      <button onClick={() => setTotpStep("verify")} className="w-full btn-shimmer text-white font-semibold py-3 rounded-xl text-sm">
                         I&apos;ve scanned it — Enter Code
                       </button>
                     </>
@@ -582,37 +707,32 @@ function VerificationTab({
                 </div>
               )}
               {totpStep === "verify" && (
-                <form onSubmit={onVerifyTotp} className="space-y-4">
+                <form onSubmit={onVerifyTotp} className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Enter the 6-digit code from your authenticator app</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Enter the 6-digit code from your authenticator app</label>
                     <input
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={6}
-                      required
+                      type="text" inputMode="numeric" maxLength={6} required
                       value={totpToken}
                       onChange={(e) => setTotpToken(e.target.value.replace(/\D/g, ""))}
-                      className="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-2xl tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="000000"
-                      autoFocus
+                      className="w-full border border-slate-300 rounded-xl px-4 py-3 text-center text-2xl tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="000000" autoFocus
                     />
                   </div>
-                  {totpError && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{totpError}</div>}
+                  {totpError && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">{totpError}</div>}
                   <button
-                    type="submit"
-                    disabled={totpLoading || totpToken.length !== 6}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60 text-sm"
+                    type="submit" disabled={totpLoading || totpToken.length !== 6}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 text-sm"
                   >
                     {totpLoading ? "Verifying…" : "Verify & Complete Setup"}
                   </button>
-                  <button type="button" onClick={() => setTotpStep("scan")} className="w-full text-sm text-gray-500 hover:text-gray-700">
+                  <button type="button" onClick={() => setTotpStep("scan")} className="w-full text-sm text-slate-400 hover:text-slate-600 transition-colors">
                     ← Back to QR code
                   </button>
                 </form>
               )}
             </div>
           )}
-        </StepCard>
+        </PremiumStepCard>
       </div>
     </div>
   )
@@ -623,27 +743,47 @@ function VerificationTab({
 function SettingsTab({ userStatus }: { userStatus: Status }) {
   return (
     <div className="max-w-lg">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your account and security preferences.</p>
+      <div className="mb-8 dash-enter">
+        <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
+        <p className="text-slate-500 text-sm mt-1">Manage your account and security preferences.</p>
       </div>
 
       {/* Profile */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-4">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">Profile</h2>
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm mb-4 overflow-hidden dash-enter dash-delay-1">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+          <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <h2 className="text-sm font-semibold text-slate-700">Profile</h2>
         </div>
-        <div className="divide-y divide-gray-50">
+
+        {/* Avatar row */}
+        <div className="px-6 py-5 border-b border-slate-50 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold ring-4 ring-blue-100 select-none">
+            {(userStatus.name ?? userStatus.email)[0].toUpperCase()}
+          </div>
+          <div>
+            <p className="font-semibold text-slate-900">{userStatus.name ?? "—"}</p>
+            <p className="text-sm text-slate-500">{userStatus.email}</p>
+          </div>
+        </div>
+
+        <div className="divide-y divide-slate-50">
           <div className="px-6 py-4">
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Full Name</p>
-            <p className="text-sm text-gray-900">{userStatus.name ?? "—"}</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</p>
+            <p className="text-sm text-slate-800 font-medium">{userStatus.name ?? "—"}</p>
           </div>
           <div className="px-6 py-4">
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Email Address</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email Address</p>
             <div className="flex items-center gap-2">
-              <p className="text-sm text-gray-900">{userStatus.email}</p>
+              <p className="text-sm text-slate-800 font-medium">{userStatus.email}</p>
               {userStatus.emailVerified && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Verified</span>
+                <span className="inline-flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-full font-semibold">
+                  <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Verified
+                </span>
               )}
             </div>
           </div>
@@ -651,29 +791,37 @@ function SettingsTab({ userStatus }: { userStatus: Status }) {
       </div>
 
       {/* Security */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-4">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">Security</h2>
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm mb-4 overflow-hidden dash-enter dash-delay-2">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+          <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <h2 className="text-sm font-semibold text-slate-700">Security</h2>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-slate-50">
           <div className="px-6 py-4 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-900">Two-Factor Authentication</p>
-              <p className="text-xs text-gray-500 mt-0.5">Google Authenticator (TOTP)</p>
+              <p className="text-sm font-semibold text-slate-800">Two-Factor Authentication</p>
+              <p className="text-xs text-slate-500 mt-0.5">Google Authenticator (TOTP)</p>
             </div>
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-              userStatus.totpEnabled ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+            <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${
+              userStatus.totpEnabled
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                : "bg-slate-100 text-slate-500 border border-slate-200"
             }`}>
+              {userStatus.totpEnabled && <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>}
               {userStatus.totpEnabled ? "Enabled" : "Not set up"}
             </span>
           </div>
           <div className="px-6 py-4 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-900">Verification Fee</p>
-              <p className="text-xs text-gray-500 mt-0.5">One-time payment of $4.99</p>
+              <p className="text-sm font-semibold text-slate-800">Verification Fee</p>
+              <p className="text-xs text-slate-500 mt-0.5">One-time payment of $4.99</p>
             </div>
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-              userStatus.stripePaid ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+            <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${
+              userStatus.stripePaid
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                : "bg-amber-50 text-amber-700 border border-amber-100"
             }`}>
               {userStatus.stripePaid ? "Paid" : "Pending"}
             </span>
@@ -682,16 +830,19 @@ function SettingsTab({ userStatus }: { userStatus: Status }) {
       </div>
 
       {/* Account */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-700">Account</h2>
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden dash-enter dash-delay-3">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+          <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 className="text-sm font-semibold text-slate-700">Account</h2>
         </div>
         <div className="px-6 py-4">
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-800 transition-colors"
+            className="flex items-center gap-2.5 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors group"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
             Sign out of AuthentikMe
@@ -702,46 +853,66 @@ function SettingsTab({ userStatus }: { userStatus: Status }) {
   )
 }
 
-/* ─── Step Card ─── */
+/* ─── Premium Step Card ─── */
 
-function StepCard({
-  number, title, description, done, locked = false, children,
+function PremiumStepCard({
+  number, title, description, done, locked = false, delay = "", children,
 }: {
   number: number
   title: string
   description: string
   done: boolean
   locked?: boolean
+  delay?: string
   children?: React.ReactNode
 }) {
   return (
-    <div className={`bg-white rounded-2xl border shadow-sm transition-all ${
-      done ? "border-green-200 bg-green-50/30" : locked ? "border-gray-100 opacity-60" : "border-gray-200"
-    }`}>
-      <div className="p-6">
+    <div
+      className={`bg-white rounded-2xl border overflow-hidden transition-all duration-300 dash-enter ${delay} ${
+        done ? "border-emerald-200 step-card-done" : locked ? "border-slate-100 opacity-50" : "border-slate-200 step-card-active"
+      }`}
+    >
+      {/* Top accent line */}
+      {!locked && (
+        <div className={`h-0.5 ${done ? "bg-gradient-to-r from-emerald-400 to-green-500" : "bg-gradient-to-r from-blue-500 to-indigo-500"}`} />
+      )}
+      <div className="p-5">
         <div className="flex items-start gap-4">
-          <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-bold text-sm ${
-            done ? "bg-green-500 text-white" : locked ? "bg-gray-100 text-gray-400" : "bg-blue-600 text-white"
+          {/* Step indicator */}
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm ${
+            done
+              ? "bg-emerald-500 text-white"
+              : locked
+              ? "bg-slate-100 text-slate-300"
+              : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-200"
           }`}>
             {done ? (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             ) : number}
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <h3 className={`font-semibold text-sm ${done ? "text-green-800" : locked ? "text-gray-400" : "text-gray-900"}`}>
+
+          <div className="flex-1 min-w-0 pt-0.5">
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+              <h3 className={`font-semibold text-sm ${done ? "text-emerald-800" : locked ? "text-slate-400" : "text-slate-900"}`}>
                 {title}
               </h3>
-              {done && <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Complete</span>}
-              {locked && !done && <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Locked</span>}
+              {done && (
+                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">Complete</span>
+              )}
+              {locked && !done && (
+                <span className="text-xs font-medium text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">Locked</span>
+              )}
             </div>
-            <p className={`text-sm ${locked ? "text-gray-400" : "text-gray-500"}`}>{description}</p>
+            <p className={`text-sm leading-relaxed ${locked ? "text-slate-300" : done ? "text-emerald-700/70" : "text-slate-500"}`}>
+              {description}
+            </p>
           </div>
         </div>
+
         {!done && !locked && children && (
-          <div className="mt-5 ml-13 pl-0.5">{children}</div>
+          <div className="mt-4 ml-13">{children}</div>
         )}
       </div>
     </div>

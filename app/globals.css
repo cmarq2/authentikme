@@ -1,3 +1,254 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Custom animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes pulseRing {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes tickerMove {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes ringExpand {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  100% { transform: scale(3.2); opacity: 0;   }
+}
+@keyframes travelDot {
+  0%   { left: 0;                opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: calc(100% - 8px); opacity: 0; }
+}
+
+/* ── Scroll reveal ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-36px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(36px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Gradient text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #2563EB 0%, #7C3AED 50%, #2563EB 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s ease infinite;
+}
+
+/* ── Floating animation ── */
+.float { animation: float 5s ease-in-out infinite; }
+
+/* ── Shimmer button ── */
+.btn-shimmer {
+  background: linear-gradient(110deg, #2563EB 0%, #1d4ed8 40%, #3b82f6 60%, #2563EB 100%);
+  background-size: 200% auto;
+  transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-shimmer:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
+}
+
+/* ── Card hover ── */
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Pulse ring ── */
+.pulse-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: #22c55e;
+  animation: pulseRing 1.8s cubic-bezier(0.21, 1, 0.58, 1) infinite;
+}
+
+/* ── Dot grid background ── */
+.dot-grid {
+  background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── Gradient orb ── */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* ── Ticker ── */
+.ticker-track {
+  animation: tickerMove 30s linear infinite;
+}
+
+/* ── Process card hover glow ── */
+.process-card:hover {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06),
+              0 0 50px rgba(59,130,246,0.18),
+              0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* ── Hesitate card hover ── */
+.hesitate-card {
+  border: 2px solid rgba(59,130,246,0.25);
+  box-shadow: 0 2px 12px rgba(59,130,246,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.hesitate-card:hover {
+  border-color: rgba(59,130,246,0.55);
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.08), 0 20px 60px rgba(59,130,246,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+  transform: translateY(-8px);
+}
+
+/* ── Dashboard entrance animations ── */
+@keyframes dashEnter {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-enter { animation: dashEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.dash-delay-1 { animation-delay: 80ms; }
+.dash-delay-2 { animation-delay: 160ms; }
+.dash-delay-3 { animation-delay: 240ms; }
+.dash-delay-4 { animation-delay: 320ms; }
+.dash-delay-5 { animation-delay: 400ms; }
+
+/* ── Shimmer sweep (code card) ── */
+@keyframes shimmerSweep {
+  from { left: -60%; }
+  to   { left: 130%; }
+}
+.shimmer-sweep { position: relative; overflow: hidden; }
+.shimmer-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+  animation: shimmerSweep 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── Code card glow ── */
+.code-card-glow {
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3), 0 32px 80px rgba(79, 70, 229, 0.18);
+  transition: box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.code-card-glow:hover {
+  box-shadow: 0 12px 48px rgba(37, 99, 235, 0.42), 0 40px 100px rgba(79, 70, 229, 0.28);
+  transform: translateY(-3px);
+}
+
+/* ── SVG ring glow ── */
+.ring-glow-blue { filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.7)); }
+.ring-glow-green { filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.7)); }
+
+/* ── Dark sidebar nav active state ── */
+.sidebar-item-active {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ── Step card premium ── */
+.step-card-active {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(37,99,235,0.06);
+}
+.step-card-active:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 32px rgba(37,99,235,0.1);
+  transform: translateY(-1px);
+}
+.step-card-done {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+/* ── Glass card ── */
+.glass {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ── Gradient border card ── */
+.gradient-border {
+  position: relative;
+  background: white;
+  border-radius: 1rem;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 1.05rem;
+  background: linear-gradient(135deg, #2563EB22, #7C3AED22, #2563EB22);
+  z-index: -1;
+}
