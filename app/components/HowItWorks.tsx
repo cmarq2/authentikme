@@ -71,7 +71,7 @@ export default function HowItWorks() {
   return (
     <section
       ref={ref}
-      className="relative py-28 px-6 overflow-hidden"
+      className="relative py-16 sm:py-28 px-4 sm:px-6 overflow-hidden"
       style={{ background: "linear-gradient(160deg, #0c1220 0%, #0a0f1e 50%, #0c1220 100%)" }}
     >
       {/* Ambient glows */}
@@ -93,7 +93,7 @@ export default function HowItWorks() {
       <div className="relative max-w-6xl mx-auto">
         {/* Header */}
         <div
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-20"
           style={{
             opacity: active ? 1 : 0,
             transform: active ? "translateY(0)" : "translateY(30px)",
@@ -105,7 +105,7 @@ export default function HowItWorks() {
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
             How It Works
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black text-white mb-4 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight">
             Three steps to <span className="gradient-text">standing out.</span>
           </h2>
           <p className="text-gray-400 text-lg max-w-lg mx-auto leading-relaxed">
@@ -114,7 +114,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Workflow row */}
-        <div className="flex items-start">
+        <div className="flex flex-col md:flex-row items-start gap-8 md:gap-0">
           {steps.map((step, i) => (
             <Fragment key={step.num}>
               {/* Step column */}
@@ -219,7 +219,7 @@ export default function HowItWorks() {
 
               {/* Animated connector between steps */}
               {i < steps.length - 1 && (
-                <div className="flex-shrink-0 flex flex-col items-center gap-2" style={{ width: 72, marginTop: 32, padding: "0 8px" }}>
+                <div className="hidden md:flex flex-shrink-0 flex-col items-center gap-2" style={{ width: 72, marginTop: 32, padding: "0 8px" }}>
                   {/* Track line with animated fill and traveling dot */}
                   <div className="relative w-full" style={{ height: 2 }}>
                     {/* Track */}

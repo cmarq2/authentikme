@@ -34,7 +34,7 @@ export default function ComparisonSection() {
   }, [])
 
   return (
-    <section ref={ref} id="compare" className="py-28 px-6 bg-white overflow-hidden relative">
+    <section ref={ref} id="compare" className="py-16 sm:py-28 px-4 sm:px-6 bg-white overflow-hidden relative">
       {/* Ambient orbs */}
       <div className="orb w-96 h-96 bg-rose-200/20 -top-24 -left-24" />
       <div className="orb w-96 h-96 bg-blue-200/20 -top-24 -right-24" />
@@ -43,7 +43,7 @@ export default function ComparisonSection() {
 
         {/* Header */}
         <div
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? "translateY(0)" : "translateY(28px)",
@@ -53,7 +53,7 @@ export default function ComparisonSection() {
           <div className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 text-gray-600 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest">
             The Difference Is Clear
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-4 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4 leading-tight">
             Unverified vs. Verified.
           </h2>
           <p className="text-gray-700 text-lg max-w-lg mx-auto leading-relaxed">

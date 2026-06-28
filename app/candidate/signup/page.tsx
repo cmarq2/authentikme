@@ -148,10 +148,10 @@ export default function SignupPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-8 space-y-5">
+          <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-5">
 
             {/* First + Last name row */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">First name</label>
                 <input
@@ -256,7 +256,7 @@ export default function SignupPage() {
             </button>
           </form>
 
-          <div className="px-8 pb-8 text-center text-sm text-gray-600">
+          <div className="px-5 sm:px-8 pb-6 sm:pb-8 text-center text-sm text-gray-600">
             Already have an account?{" "}
             <Link href="/login" className="text-blue-600 hover:underline font-medium">
               Sign in

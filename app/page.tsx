@@ -4,6 +4,7 @@ import CountUp from "./components/CountUp"
 import HeroVisual from "./components/HeroVisual"
 import HowItWorks from "./components/HowItWorks"
 import ComparisonSection from "./components/ComparisonSection"
+import HeaderNav from "./components/HeaderNav"
 
 const whyMatters = [
   { num: "01", title: "Prove You're Real", desc: "Our identity verification confirms you are a real, living person — not an AI-generated profile, not a spam account. Employers receive that confirmation the moment they view your profile." },
@@ -41,35 +42,16 @@ export default function Home() {
     <div className="min-h-screen bg-white text-gray-900 antialiased">
 
       {/* ── Header ── */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="#" className="font-extrabold text-xl tracking-tight text-gray-900 hover:opacity-80 transition-opacity">
-            Authentik<span className="text-blue-600">Me</span>
-          </a>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
-            <a href="#why" className="hover:text-gray-900 transition-colors">Why It Matters</a>
-            <a href="#process" className="hover:text-gray-900 transition-colors">Process</a>
-            <a href="#compare" className="hover:text-gray-900 transition-colors">Compare</a>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors hidden sm:block">
-              Sign in
-            </Link>
-            <Link href="/candidate/signup" className="btn-shimmer text-white text-sm font-semibold px-5 py-2.5 rounded-xl">
-              Get Verified
-            </Link>
-          </div>
-        </div>
-      </header>
+      <HeaderNav />
 
       {/* ── Hero ── */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden dot-grid">
+      <section className="relative pt-24 sm:pt-32 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden dot-grid">
         {/* Gradient orbs */}
         <div className="orb w-[600px] h-[600px] bg-blue-400/20 -top-48 -left-48" />
         <div className="orb w-[400px] h-[400px] bg-violet-400/15 top-0 right-0" />
 
         <div className="relative max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left */}
             <div style={{ animation: "slideInLeft 0.9s cubic-bezier(0.16,1,0.3,1) both" }}>
               {/* Badge */}
@@ -82,7 +64,7 @@ export default function Home() {
               </div>
 
               {/* Headline */}
-              <h1 className="text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight mb-6 text-gray-900">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight mb-6 text-gray-900">
                 Prove You Are<br />
                 <span className="gradient-text">Real. Get Hired.</span>
               </h1>
@@ -162,9 +144,9 @@ export default function Home() {
       <HowItWorks />
 
       {/* ── Why It Matters ── */}
-      <section id="why" className="py-28 px-6 bg-white overflow-hidden">
+      <section id="why" className="py-16 sm:py-28 px-4 sm:px-6 bg-white overflow-hidden">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             {/* Left column */}
             <ScrollReveal direction="left">
@@ -175,7 +157,7 @@ export default function Home() {
                 </svg>
                 Why It Matters
               </div>
-              <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6 leading-[1.08]">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6 leading-[1.08]">
                 Verified Human.<br />
                 <span className="gradient-text">Not a Bot.</span>
               </h2>
@@ -236,14 +218,14 @@ export default function Home() {
       </section>
 
       {/* ── Employer Reality — dark stats ── */}
-      <section className="relative py-24 px-6 bg-gray-950 overflow-hidden">
+      <section className="relative py-16 sm:py-24 px-4 sm:px-6 bg-gray-950 overflow-hidden">
         <div className="orb w-[500px] h-[500px] bg-blue-600/10 -top-32 -right-32" />
         <div className="orb w-[400px] h-[400px] bg-violet-600/10 -bottom-32 -left-32" />
 
         <div className="relative max-w-6xl mx-auto">
           <ScrollReveal className="max-w-xl mb-16">
             <p className="text-blue-400 text-xs font-bold uppercase tracking-widest mb-4">The Employer Reality</p>
-            <h2 className="text-4xl font-black text-white mb-4">The scale of the problem.</h2>
+            <h2 className="text-2xl sm:text-4xl font-black text-white mb-4">The scale of the problem.</h2>
             <p className="text-gray-400 text-lg leading-relaxed">
               Over 70% of hiring managers now report receiving AI-generated, fake, or spam applications — and the number is rising every quarter.
             </p>
@@ -258,7 +240,7 @@ export default function Home() {
               { stat: 70, suffix: "%", label: "of hiring managers report receiving fake applications", prefix: "" },
             ].map((item, i) => (
               <ScrollReveal key={i} delay={i * 80}>
-                <div className="glass rounded-2xl p-7 text-center card-hover">
+                <div className="glass rounded-2xl p-5 sm:p-7 text-center card-hover">
                   <div className="text-3xl lg:text-4xl font-black text-white mb-2">
                     <CountUp to={item.stat} prefix={item.prefix} suffix={item.suffix} />
                   </div>
@@ -271,21 +253,21 @@ export default function Home() {
       </section>
 
       {/* ── Why Employers Hesitate ── */}
-      <section className="py-28 px-6 bg-gray-50 overflow-hidden relative">
+      <section className="py-16 sm:py-28 px-4 sm:px-6 bg-gray-50 overflow-hidden relative">
         {/* Ambient orbs */}
         <div className="orb w-[500px] h-[500px] bg-blue-200/20 -top-32 -right-32" />
         <div className="orb w-80 h-80 bg-rose-200/15 bottom-0 -left-20" />
         <div className="max-w-6xl mx-auto relative">
 
           {/* Centered header */}
-          <ScrollReveal className="text-center mb-16 max-w-3xl mx-auto">
+          <ScrollReveal className="text-center mb-10 sm:mb-16 max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-100 text-rose-600 text-base font-bold px-6 py-3 rounded-full mb-6 uppercase tracking-widest">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
               </svg>
               The Problem
             </div>
-            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-5 leading-tight tracking-tight">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5 leading-tight tracking-tight">
               Why Employers Hesitate.
             </h2>
             <p className="text-gray-700 text-lg leading-relaxed">
@@ -333,7 +315,7 @@ export default function Home() {
           {/* Resolution banner */}
           <ScrollReveal className="mt-14">
             <div
-              className="relative rounded-3xl px-10 py-9 overflow-hidden text-center"
+              className="relative rounded-3xl px-5 sm:px-10 py-7 sm:py-9 overflow-hidden text-center"
               style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 45%, #7c3aed 100%)" }}
             >
               {/* Decorative orbs inside banner */}
@@ -341,7 +323,7 @@ export default function Home() {
               <div className="orb w-48 h-48 bg-white/6 -bottom-12 -left-12" />
               <div className="relative">
                 <p className="text-blue-200 text-xs font-bold uppercase tracking-widest mb-3">The Solution</p>
-                <h3 className="text-white text-2xl lg:text-3xl font-black mb-3 leading-tight">
+                <h3 className="text-white text-xl sm:text-2xl lg:text-3xl font-black mb-3 leading-tight">
                   AuthentikMe eliminates every one<br className="hidden sm:block" /> of these risks — instantly.
                 </h3>
                 <p className="text-blue-200/80 text-sm mb-7 max-w-lg mx-auto">
@@ -363,7 +345,7 @@ export default function Home() {
       {/* ── The Process ── */}
       <section
         id="process"
-        className="py-28 px-6 relative overflow-hidden"
+        className="py-16 sm:py-28 px-4 sm:px-6 relative overflow-hidden"
         style={{ background: "linear-gradient(135deg, #020617 0%, #0a0f2e 30%, #0f0a1e 65%, #020617 100%)" }}
       >
         {/* Subtle grid overlay */}
@@ -383,12 +365,12 @@ export default function Home() {
 
         <div className="relative max-w-6xl mx-auto">
           {/* Header */}
-          <ScrollReveal className="text-center mb-20">
+          <ScrollReveal className="text-center mb-12 sm:mb-20">
             <div className="inline-flex items-center gap-2 border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
               The Process
             </div>
-            <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
               Verified in minutes.<br />
               <span className="gradient-text">Trusted by employers.</span>
             </h2>
@@ -446,7 +428,7 @@ export default function Home() {
               ].map((item, i) => (
                 <div
                   key={item.value}
-                  className={`py-10 text-center transition-colors duration-300 hover:bg-white/5 ${i > 0 ? "border-t sm:border-t-0 sm:border-l border-white/10" : ""}`}
+                  className={`py-7 sm:py-10 text-center transition-colors duration-300 hover:bg-white/5 ${i > 0 ? "border-t sm:border-t-0 sm:border-l border-white/10" : ""}`}
                 >
                   <div
                     className="text-4xl lg:text-5xl font-black mb-2"
@@ -466,7 +448,7 @@ export default function Home() {
       <ComparisonSection />
 
       {/* ── CTA ── */}
-      <section className="relative py-32 px-6 bg-gray-950 overflow-hidden text-center">
+      <section className="relative py-20 sm:py-32 px-4 sm:px-6 bg-gray-950 overflow-hidden text-center">
         <div className="orb w-[800px] h-[800px] bg-blue-600/15 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 
         <div className="relative max-w-2xl mx-auto">
@@ -475,7 +457,7 @@ export default function Home() {
               <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
               Start Today
             </div>
-            <h2 className="text-5xl font-black text-white mb-5 leading-tight">
+            <h2 className="text-3xl sm:text-5xl font-black text-white mb-5 leading-tight">
               Ready to be<br /><span className="gradient-text">Verified?</span>
             </h2>
             <p className="text-gray-400 text-lg mb-10 leading-relaxed">
@@ -494,7 +476,7 @@ export default function Home() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="bg-gray-950 border-t border-gray-800/50 py-8 px-6">
+      <footer className="bg-gray-950 border-t border-gray-800/50 py-8 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="font-extrabold text-lg text-white">
             Authentik<span className="text-blue-500">Me</span>
