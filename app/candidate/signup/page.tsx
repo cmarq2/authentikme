@@ -1,67 +1,37 @@
 "use client"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 
-type AccountType = "candidate" | "employer"
-
-export default function SignupPage() {
-  const [accountType, setAccountType] = useState<AccountType>("candidate")
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [company, setCompany] = useState("")
+export default function CandidateSignupPage() {
+  const router = useRouter()
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  function switchTab(tab: AccountType) {
-    setAccountType(tab)
-    setError("")
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.")
-      return
-    }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.")
-      return
-    }
-
     setLoading(true)
-    const fullName = `${firstName.trim()} ${lastName.trim()}`
 
-    try {
-      if (accountType === "candidate") {
-        const res = await fetch("/api/candidate/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: fullName, email, password }),
-        })
-        const data = await res.json()
-        if (!res.ok) { setError(data.error || "Something went wrong. Please try again."); return }
-        setSuccess(true)
-      } else {
-        const res = await fetch("/api/employer/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: fullName, company, email, password }),
-        })
-        const data = await res.json()
-        if (!res.ok) { setError(data.error || "Something went wrong. Please try again."); return }
-        setSuccess(true)
-      }
-    } catch {
-      setError("Something went wrong. Please try again.")
-    } finally {
-      setLoading(false)
+    const res = await fetch("/api/candidate/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
+    })
+
+    const data = await res.json()
+    setLoading(false)
+
+    if (!res.ok) {
+      setError(data.error)
+      return
     }
+
+    setSuccess(true)
   }
 
   if (success) {
@@ -71,19 +41,15 @@ export default function SignupPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {accountType === "candidate" ? "Check your email" : "Account created!"}
-            </h2>
-            <p className="text-gray-700 text-sm mb-6">
-              {accountType === "candidate"
-                ? <>We sent a verification link to <strong>{email}</strong>. Click it to continue your setup.</>
-                : <>Your employer account is ready. You can now sign in.</>}
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
+            <p className="text-gray-500 text-sm mb-6">
+              We sent a verification link to <strong>{email}</strong>. Click it to continue your setup.
             </p>
-            <Link href="/login" className="btn-shimmer inline-block text-white font-semibold px-8 py-3 rounded-xl text-sm">
-              Go to Sign In
+            <Link href="/login" className="text-blue-600 hover:underline text-sm font-medium">
+              Return to sign in
             </Link>
           </div>
         </div>
@@ -92,149 +58,49 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-lg">
-
-        {/* Back to site */}
-        <div className="mb-6">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Back to site
-          </Link>
-        </div>
-
-        {/* Logo */}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-extrabold text-gray-900">
-            Authentik<span className="text-blue-600">Me</span>
+          <Link href="/" className="text-2xl font-bold text-blue-900">
+            Authentik<span className="text-blue-500">Me</span>
           </Link>
-          <p className="text-gray-600 mt-2 text-sm">Create your account to get started</p>
+          <p className="text-gray-500 mt-2">Create your candidate account</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-
-          {/* Account type tabs */}
-          <div className="flex border-b border-gray-200">
-            <button
-              type="button"
-              onClick={() => switchTab("candidate")}
-              className={`flex-1 py-4 text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
-                accountType === "candidate"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50/50"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              I&apos;m a Candidate
-            </button>
-            <button
-              type="button"
-              onClick={() => switchTab("employer")}
-              className={`flex-1 py-4 text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
-                accountType === "employer"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50/50"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              I&apos;m an Employer
-            </button>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="p-8 space-y-5">
-
-            {/* First + Last name row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">First name</label>
-                <input
-                  type="text"
-                  required
-                  value={firstName}
-                  onChange={e => setFirstName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Jane"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Last name</label>
-                <input
-                  type="text"
-                  required
-                  value={lastName}
-                  onChange={e => setLastName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Smith"
-                />
-              </div>
-            </div>
-
-            {/* Company name — employer only */}
-            {accountType === "employer" && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Company name</label>
-                <input
-                  type="text"
-                  required
-                  value={company}
-                  onChange={e => setCompany(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Acme Corp"
-                />
-              </div>
-            )}
-
-            {/* Email */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Jane Smith"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
               <input
                 type="email"
                 required
                 value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                placeholder={accountType === "employer" ? "hr@company.com" : "you@example.com"}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="you@example.com"
               />
             </div>
-
-            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
                 type="password"
                 required
                 value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="At least 8 characters"
               />
-            </div>
-
-            {/* Confirm password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm password</label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                className={`w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition ${
-                  confirmPassword && confirmPassword !== password
-                    ? "border-red-300 focus:ring-red-400"
-                    : "border-gray-300 focus:ring-blue-500"
-                }`}
-                placeholder="Re-enter your password"
-              />
-              {confirmPassword && confirmPassword !== password && (
-                <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
-              )}
             </div>
 
             {error && (
@@ -246,22 +112,18 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-shimmer text-white font-semibold py-3.5 rounded-xl transition disabled:opacity-60 text-sm"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60"
             >
-              {loading
-                ? "Creating account…"
-                : accountType === "candidate"
-                  ? "Create Candidate Account"
-                  : "Create Employer Account"}
+              {loading ? "Creating account…" : "Create Account"}
             </button>
           </form>
 
-          <div className="px-8 pb-8 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link href="/login" className="text-blue-600 hover:underline font-medium">
               Sign in
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>

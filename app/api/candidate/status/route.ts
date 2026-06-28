@@ -15,7 +15,6 @@ export async function GET() {
       emailVerified: true,
       recaptchaDone: true,
       totpEnabled: true,
-      stripePaid: true,
       verificationCode: true,
       name: true,
       email: true,

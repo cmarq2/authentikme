@@ -28,8 +28,5 @@ export default withAuth(
 )
 
 export const config = {
-  matcher: [
-    "/candidate/((?!signup$|verify-email).+)",
-    "/employer/((?!signup$).+)",
-  ],
+  matcher: ["/candidate/:path*", "/employer/:path*"],
 }

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -41,7 +41,7 @@ export default function EmployerSignupPage() {
           <Link href="/" className="text-2xl font-bold text-blue-900">
             Authentik<span className="text-blue-500">Me</span>
           </Link>
-          <p className="text-gray-700 mt-2">Register your company account</p>
+          <p className="text-gray-500 mt-2">Register your company account</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
@@ -106,7 +106,7 @@ export default function EmployerSignupPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-700">
+          <p className="mt-6 text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link href="/login" className="text-blue-600 hover:underline font-medium">
               Sign in
@@ -117,4 +117,3 @@ export default function EmployerSignupPage() {
     </div>
   )
 }
-

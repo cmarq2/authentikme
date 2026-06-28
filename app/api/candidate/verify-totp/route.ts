@@ -26,18 +26,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid code. Open your authenticator app and try again." }, { status: 400 })
   }
 
-  const allStepsDone = user.emailVerified && user.stripePaid && user.recaptchaDone
   const verificationCode =
     user.verificationCode ??
-    (allStepsDone
-      ? "ATK-" + crypto.randomBytes(4).toString("hex").toUpperCase() +
-        "-" + crypto.randomBytes(4).toString("hex").toUpperCase()
-      : null)
+    "ATK-" + crypto.randomBytes(4).toString("hex").toUpperCase() +
+    "-" + crypto.randomBytes(4).toString("hex").toUpperCase()
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { totpEnabled: true, ...(verificationCode ? { verificationCode } : {}) },
+    data: { totpEnabled: true, verificationCode },
   })
 
-  return NextResponse.json({ message: "Authenticator verified" })
+  return NextResponse.json({ message: "Authenticator verified", verificationCode })
 }

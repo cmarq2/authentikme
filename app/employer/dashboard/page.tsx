@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
@@ -54,10 +54,10 @@ export default function EmployerDashboard() {
             Authentik<span className="text-blue-500">Me</span>
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-700">{session?.user?.email}</span>
+            <span className="text-sm text-gray-500">{session?.user?.email}</span>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="text-sm text-gray-700 hover:text-gray-700"
+              className="text-sm text-gray-500 hover:text-gray-700"
             >
               Sign out
             </button>
@@ -67,7 +67,7 @@ export default function EmployerDashboard() {
 
       <main className="max-w-lg mx-auto px-4 py-16">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Verify a Candidate</h1>
-        <p className="text-gray-700 mb-8">
+        <p className="text-gray-500 mb-8">
           Enter the verification code shared by the candidate to confirm their identity is real and verified.
         </p>
 
@@ -151,4 +151,3 @@ export default function EmployerDashboard() {
     </div>
   )
 }
-
