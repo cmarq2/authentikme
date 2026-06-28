@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
@@ -112,7 +112,7 @@ export default function SetupPage() {
           <Link href="/" className="text-2xl font-bold text-blue-900">
             Authentik<span className="text-blue-500">Me</span>
           </Link>
-          <p className="text-gray-500 mt-1 text-sm">Complete your identity verification</p>
+          <p className="text-gray-700 mt-1 text-sm">Complete your identity verification</p>
         </div>
 
         {/* Progress Steps */}
@@ -130,7 +130,7 @@ export default function SetupPage() {
                       ? "bg-green-500 text-white"
                       : step === s.n
                       ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-400"
+                      : "bg-gray-200 text-gray-600"
                   }`}
                 >
                   {s.done ? (
@@ -141,7 +141,7 @@ export default function SetupPage() {
                     s.n
                   )}
                 </div>
-                <span className="text-xs text-gray-500 mt-1">{s.label}</span>
+                <span className="text-xs text-gray-700 mt-1">{s.label}</span>
               </div>
               {i < 2 && <div className="w-12 h-px bg-gray-300 mb-4" />}
             </div>
@@ -154,7 +154,7 @@ export default function SetupPage() {
           {!userStatus.recaptchaDone && (
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-1">Step 2: Prove you are human</h2>
-              <p className="text-gray-500 text-sm mb-6">Complete the reCAPTCHA challenge below.</p>
+              <p className="text-gray-700 text-sm mb-6">Complete the reCAPTCHA challenge below.</p>
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">
                   {error}
@@ -174,7 +174,7 @@ export default function SetupPage() {
           {userStatus.recaptchaDone && !userStatus.totpEnabled && (
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-1">Step 3: Set up Google Authenticator</h2>
-              <p className="text-gray-500 text-sm mb-6">
+              <p className="text-gray-700 text-sm mb-6">
                 Install Google Authenticator on your phone, then scan the QR code below.
               </p>
 
@@ -244,7 +244,7 @@ export default function SetupPage() {
                   <button
                     type="button"
                     onClick={() => setTotpStep("scan")}
-                    className="w-full text-sm text-gray-500 hover:text-gray-700"
+                    className="w-full text-sm text-gray-700 hover:text-gray-700"
                   >
                     Go back to QR code
                   </button>
@@ -257,3 +257,4 @@ export default function SetupPage() {
     </div>
   )
 }
+

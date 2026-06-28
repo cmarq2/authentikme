@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
@@ -38,7 +38,7 @@ function VerifyEmailContent() {
             </svg>
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
-          <p className="text-gray-500 text-sm">We sent a verification link to your email. Click it to continue your setup.</p>
+          <p className="text-gray-700 text-sm">We sent a verification link to your email. Click it to continue your setup.</p>
         </div>
       </div>
     )
@@ -50,7 +50,7 @@ function VerifyEmailContent() {
         {status === "loading" && (
           <>
             <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-500">Verifying your email…</p>
+            <p className="text-gray-700">Verifying your email…</p>
           </>
         )}
 
@@ -62,7 +62,7 @@ function VerifyEmailContent() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Email Verified!</h2>
-            <p className="text-gray-500 text-sm mb-6">Your email has been confirmed. Sign in to continue your identity setup.</p>
+            <p className="text-gray-700 text-sm mb-6">Your email has been confirmed. Sign in to continue your identity setup.</p>
             <Link
               href="/login"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
@@ -80,7 +80,7 @@ function VerifyEmailContent() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Verification Failed</h2>
-            <p className="text-gray-500 text-sm mb-6">{message}</p>
+            <p className="text-gray-700 text-sm mb-6">{message}</p>
             <Link href="/candidate/signup" className="text-blue-600 hover:underline text-sm font-medium">
               Sign up again
             </Link>
@@ -102,3 +102,4 @@ export default function VerifyEmailPage() {
     </Suspense>
   )
 }
+
