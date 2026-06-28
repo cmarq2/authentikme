@@ -17,39 +17,39 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <main className="flex flex-col items-center justify-center text-center px-6 pt-20 pb-32">
-        <div className="inline-flex items-center gap-2 bg-blue-800 border border-blue-600 text-blue-200 text-sm px-4 py-1.5 rounded-full mb-8">
-          <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+      <main className="flex flex-col items-center justify-center text-center px-5 pt-10 pb-16 sm:pt-20 sm:pb-32">
+        <div className="inline-flex items-center gap-2 bg-blue-800 border border-blue-600 text-blue-200 text-xs sm:text-sm px-3 sm:px-4 py-1.5 rounded-full mb-6 sm:mb-8">
+          <span className="w-2 h-2 bg-green-400 rounded-full shrink-0"></span>
           Fighting fraudulent job applications
         </div>
 
-        <h1 className="text-5xl font-extrabold text-white max-w-3xl leading-tight mb-6">
-          Prove You Are Real.<br />
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-white max-w-3xl leading-tight mb-5 sm:mb-6">
+          Prove You Are Real.{" "}
           <span className="text-blue-300">Get Hired with Confidence.</span>
         </h1>
 
-        <p className="text-blue-200 text-lg max-w-xl mb-12">
+        <p className="text-blue-200 text-base sm:text-lg max-w-xl mb-8 sm:mb-12 px-2">
           Candidates verify their identity with email, reCAPTCHA, and Google Authenticator,
           then receive a unique code to share with employers for instant verification.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
           <Link
             href="/candidate/signup"
-            className="bg-white text-blue-900 font-semibold px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors text-lg shadow-lg"
+            className="bg-white text-blue-900 font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl hover:bg-blue-50 transition-colors text-base sm:text-lg shadow-lg text-center"
           >
-            I'm a Candidate
+            I&apos;m a Candidate
           </Link>
           <Link
             href="/employer/signup"
-            className="bg-blue-600 border border-blue-500 text-white font-semibold px-8 py-4 rounded-xl hover:bg-blue-500 transition-colors text-lg shadow-lg"
+            className="bg-blue-600 border border-blue-500 text-white font-semibold px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl hover:bg-blue-500 transition-colors text-base sm:text-lg shadow-lg text-center"
           >
-            I'm an Employer
+            I&apos;m an Employer
           </Link>
         </div>
 
         {/* How it works */}
-        <div className="mt-24 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl w-full text-left">
+        <div className="mt-12 sm:mt-24 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 max-w-3xl w-full text-left">
           {[
             {
               step: "1",
