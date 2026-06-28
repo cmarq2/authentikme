@@ -12,6 +12,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^2.0.2",
     "@prisma/client": "^5.19.1",
     "bcryptjs": "^2.4.3",
     "next": "14.2.35",
@@ -21,7 +22,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-google-recaptcha": "^3.1.0",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "stripe": "^22.3.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -48,7 +48,7 @@ export default function LoginPage() {
           <Link href="/" className="text-2xl font-bold text-blue-900">
             Authentik<span className="text-blue-500">Me</span>
           </Link>
-          <p className="text-gray-500 mt-2">Sign in to your account</p>
+          <p className="text-gray-700 mt-2">Sign in to your account</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
@@ -91,7 +91,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500 space-y-2">
+          <div className="mt-6 text-center text-sm text-gray-700 space-y-2">
             <p>
               New candidate?{" "}
               <Link href="/candidate/signup" className="text-blue-600 hover:underline font-medium">
@@ -110,3 +110,4 @@ export default function LoginPage() {
     </div>
   )
 }
+
