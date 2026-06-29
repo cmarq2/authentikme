@@ -66,7 +66,7 @@ export default function Home() {
               {/* Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight mb-6 text-gray-900">
                 Prove You Are<br />
-                <span className="gradient-text">Real. Get Hired.</span>
+                <span className="gradient-text">Real. Real Opportunities.</span>
               </h1>
 
               <p className="text-gray-700 text-lg leading-relaxed mb-10 max-w-lg">
