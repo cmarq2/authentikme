@@ -20,8 +20,10 @@ model User {
   totpSecret       String?
   totpEnabled      Boolean  @default(false)
   verificationCode String?  @unique
-  stripePaid       Boolean  @default(false)
-  stripeSessionId  String?
+  stripePaid           Boolean  @default(false)
+  stripeSessionId      String?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }

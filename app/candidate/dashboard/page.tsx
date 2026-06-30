@@ -8,6 +8,7 @@ import ReCAPTCHA from "react-google-recaptcha"
 type Status = {
   emailVerified: boolean
   stripePaid: boolean
+  stripeSubscriptionId: string | null
   recaptchaDone: boolean
   totpEnabled: boolean
   verificationCode: string | null
@@ -289,7 +290,7 @@ function DashboardInner() {
             />
           )}
           {activeTab === "settings" && (
-            <SettingsTab userStatus={userStatus} />
+            <SettingsTab userStatus={userStatus} onStatusChange={fetchStatus} />
           )}
         </main>
       </div>
@@ -647,7 +648,7 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={2} title="Pay verification fee" description="A one-time $4.99 fee covers the cost of your identity verification." done={userStatus.stripePaid} locked={!userStatus.emailVerified} delay="dash-delay-2">
+        <PremiumStepCard number={2} title="Subscribe — $4.99/month" description="A monthly $4.99 subscription keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.emailVerified} delay="dash-delay-2">
           {!userStatus.stripePaid && userStatus.emailVerified && (
             <div className="space-y-2">
               <button
@@ -658,7 +659,7 @@ function VerificationTab({
                 {paymentLoading ? (
                   <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Redirecting to payment…</>
                 ) : (
-                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Pay $4.99 with Stripe</>
+                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Subscribe $4.99/mo with Stripe</>
                 )}
               </button>
               {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
@@ -740,7 +741,26 @@ function VerificationTab({
 
 /* ─── Settings Tab ─── */
 
-function SettingsTab({ userStatus }: { userStatus: Status }) {
+function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onStatusChange: () => void }) {
+  const [cancelLoading, setCancelLoading] = useState(false)
+  const [cancelError, setCancelError] = useState("")
+  const [cancelConfirm, setCancelConfirm] = useState(false)
+
+  async function handleCancel() {
+    setCancelLoading(true)
+    setCancelError("")
+    try {
+      const res = await fetch("/api/candidate/cancel-subscription", { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) { setCancelError(data.error || "Failed to cancel."); setCancelLoading(false); return }
+      setCancelConfirm(false)
+      onStatusChange()
+    } catch {
+      setCancelError("Something went wrong. Please try again.")
+      setCancelLoading(false)
+    }
+  }
+
   return (
     <div className="max-w-lg">
       <div className="mb-8 dash-enter">
@@ -757,7 +777,6 @@ function SettingsTab({ userStatus }: { userStatus: Status }) {
           <h2 className="text-sm font-semibold text-slate-700">Profile</h2>
         </div>
 
-        {/* Avatar row */}
         <div className="px-6 py-5 border-b border-slate-50 flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold ring-4 ring-blue-100 select-none">
             {(userStatus.name ?? userStatus.email)[0].toUpperCase()}
@@ -815,22 +834,73 @@ function SettingsTab({ userStatus }: { userStatus: Status }) {
           </div>
           <div className="px-6 py-4 flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-800">Verification Fee</p>
-              <p className="text-xs text-slate-500 mt-0.5">One-time payment of $4.99</p>
+              <p className="text-sm font-semibold text-slate-800">Subscription</p>
+              <p className="text-xs text-slate-500 mt-0.5">$4.99/month · billed on the 16th</p>
             </div>
             <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${
               userStatus.stripePaid
                 ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
                 : "bg-amber-50 text-amber-700 border border-amber-100"
             }`}>
-              {userStatus.stripePaid ? "Paid" : "Pending"}
+              {userStatus.stripePaid ? "Active" : "Inactive"}
             </span>
           </div>
         </div>
       </div>
 
+      {/* Subscription management */}
+      {userStatus.stripePaid && (
+        <div className="bg-white rounded-2xl border border-red-100 shadow-sm mb-4 overflow-hidden dash-enter dash-delay-3">
+          <div className="px-6 py-4 border-b border-red-50 flex items-center gap-2">
+            <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            <h2 className="text-sm font-semibold text-slate-700">Subscription</h2>
+          </div>
+          <div className="px-6 py-5">
+            {!cancelConfirm ? (
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">Cancel subscription</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Your badge and ATK code will be revoked immediately.</p>
+                </div>
+                <button
+                  onClick={() => setCancelConfirm(true)}
+                  className="text-sm font-semibold text-red-500 hover:text-red-700 border border-red-200 hover:border-red-300 px-4 py-2 rounded-xl transition-colors"
+                >
+                  Cancel plan
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+                  <p className="text-sm font-semibold text-red-800">Are you sure?</p>
+                  <p className="text-xs text-red-600 mt-0.5">Your verification badge and ATK code will stop working immediately. You can resubscribe at any time.</p>
+                </div>
+                {cancelError && <p className="text-xs text-red-600">{cancelError}</p>}
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCancel}
+                    disabled={cancelLoading}
+                    className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-60"
+                  >
+                    {cancelLoading ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : "Yes, cancel"}
+                  </button>
+                  <button
+                    onClick={() => { setCancelConfirm(false); setCancelError("") }}
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold py-2.5 rounded-xl transition-colors"
+                  >
+                    Keep subscription
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Account */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden dash-enter dash-delay-3">
+      <div className={`bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden dash-enter ${userStatus.stripePaid ? "dash-delay-4" : "dash-delay-3"}`}>
         <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
           <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

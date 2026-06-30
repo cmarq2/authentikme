@@ -23,7 +23,6 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user || user.stripePaid) return NextResponse.json({ ok: true })
 
-    // Generate verification code if all other steps are also complete
     const allStepsDone = user.emailVerified && user.recaptchaDone && user.totpEnabled
     const verificationCode = allStepsDone
       ? `ATK-${crypto.randomBytes(4).toString("hex").toUpperCase()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
@@ -34,7 +33,41 @@ export async function POST(req: Request) {
       data: {
         stripePaid: true,
         stripeSessionId: session.id,
+        stripeCustomerId: session.customer as string ?? null,
+        stripeSubscriptionId: session.subscription as string ?? null,
         ...(verificationCode ? { verificationCode } : {}),
+      },
+    })
+  }
+
+  // Subscription cancelled or expired — revoke access immediately
+  if (
+    event.type === "customer.subscription.deleted" ||
+    event.type === "customer.subscription.paused"
+  ) {
+    const subscription = event.data.object as Stripe.Subscription
+    const customerId = subscription.customer as string
+
+    await prisma.user.updateMany({
+      where: { stripeCustomerId: customerId },
+      data: {
+        stripePaid: false,
+        stripeSubscriptionId: null,
+        verificationCode: null,
+      },
+    })
+  }
+
+  // Payment failed — revoke access
+  if (event.type === "invoice.payment_failed") {
+    const invoice = event.data.object as Stripe.Invoice
+    const customerId = invoice.customer as string
+
+    await prisma.user.updateMany({
+      where: { stripeCustomerId: customerId },
+      data: {
+        stripePaid: false,
+        verificationCode: null,
       },
     })
   }
