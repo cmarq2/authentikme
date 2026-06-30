@@ -57,6 +57,11 @@ function DashboardInner() {
   const [totpLoading, setTotpLoading] = useState(false)
   const [totpError, setTotpError] = useState("")
 
+  const [discountCode, setDiscountCode] = useState("")
+  const [discountLoading, setDiscountLoading] = useState(false)
+  const [discountError, setDiscountError] = useState("")
+  const [discountSuccess, setDiscountSuccess] = useState(false)
+
   const paymentResult = searchParams.get("payment")
 
   async function fetchStatus() {
@@ -98,6 +103,24 @@ function DashboardInner() {
       setPaymentError("Payment setup failed. Please try again.")
       setPaymentLoading(false)
     }
+  }
+
+  async function handleDiscount(e: React.FormEvent) {
+    e.preventDefault()
+    setDiscountLoading(true); setDiscountError(""); setDiscountSuccess(false)
+    try {
+      const res = await fetch("/api/candidate/apply-discount", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: discountCode }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setDiscountError(data.error); setDiscountLoading(false); return }
+      setDiscountSuccess(true)
+      fetchStatus()
+    } catch {
+      setDiscountError("Something went wrong. Please try again.")
+    }
+    setDiscountLoading(false)
   }
 
   async function handleCaptcha(token: string | null) {
@@ -287,6 +310,12 @@ function DashboardInner() {
               allDone={allDone}
               copied={copied}
               copyCode={copyCode}
+              discountCode={discountCode}
+              discountLoading={discountLoading}
+              discountError={discountError}
+              discountSuccess={discountSuccess}
+              setDiscountCode={setDiscountCode}
+              onApplyDiscount={handleDiscount}
             />
           )}
           {activeTab === "settings" && (
@@ -583,6 +612,12 @@ function VerificationTab({
   allDone: boolean
   copied: boolean
   copyCode: () => void
+  discountCode: string
+  discountLoading: boolean
+  discountError: string
+  discountSuccess: boolean
+  setDiscountCode: (v: string) => void
+  onApplyDiscount: (e: React.FormEvent) => void
 }) {
   return (
     <div className="max-w-2xl">
@@ -650,7 +685,7 @@ function VerificationTab({
 
         <PremiumStepCard number={2} title="Subscribe — $4.99/month" description="A monthly $4.99 subscription keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.emailVerified} delay="dash-delay-2">
           {!userStatus.stripePaid && userStatus.emailVerified && (
-            <div className="space-y-2">
+            <div className="space-y-4">
               <button
                 onClick={onPay}
                 disabled={paymentLoading}
@@ -663,6 +698,30 @@ function VerificationTab({
                 )}
               </button>
               {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
+
+              {/* Discount code */}
+              <div className="border-t border-slate-100 pt-4">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Have a discount code?</p>
+                <form onSubmit={onApplyDiscount} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                    placeholder="Enter code"
+                    className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-mono font-semibold tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:normal-case placeholder:tracking-normal placeholder:font-normal"
+                    maxLength={20}
+                  />
+                  <button
+                    type="submit"
+                    disabled={discountLoading || !discountCode.trim()}
+                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50"
+                  >
+                    {discountLoading ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : "Apply"}
+                  </button>
+                </form>
+                {discountError && <p className="text-xs text-red-600 mt-2">{discountError}</p>}
+                {discountSuccess && <p className="text-xs text-emerald-600 font-semibold mt-2">Discount applied! Subscription activated.</p>}
+              </div>
             </div>
           )}
         </PremiumStepCard>

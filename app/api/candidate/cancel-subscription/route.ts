@@ -14,12 +14,16 @@ export async function POST() {
   }
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } })
-  if (!user?.stripeSubscriptionId) {
+  if (!user?.stripePaid) {
     return NextResponse.json({ error: "No active subscription found." }, { status: 400 })
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2026-06-24.dahlia" })
-  await stripe.subscriptions.cancel(user.stripeSubscriptionId)
+  // Only call Stripe for real (paid) subscriptions, not free discount ones
+  const isFreeAccount = !user.stripeSubscriptionId || user.stripeSubscriptionId.startsWith("free_")
+  if (!isFreeAccount) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" })
+    await stripe.subscriptions.cancel(user.stripeSubscriptionId!)
+  }
 
   await prisma.user.update({
     where: { id: session.user.id },
