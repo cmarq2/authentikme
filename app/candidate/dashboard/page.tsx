@@ -591,6 +591,7 @@ function VerificationTab({
   recaptchaRef, totpStep, qrCode, totpToken, totpLoading, totpError,
   onPay, onCaptcha, onStartTotp, onVerifyTotp, setTotpToken, setTotpStep,
   allDone, copied, copyCode,
+  discountCode, discountLoading, discountError, discountSuccess, setDiscountCode, onApplyDiscount,
 }: {
   userStatus: Status
   paymentResult: string | null
