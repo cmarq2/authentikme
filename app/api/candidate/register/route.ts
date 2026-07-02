@@ -34,8 +34,8 @@ export async function POST(req: Request) {
 
   try {
     await sendVerificationEmail(email.toLowerCase(), emailToken)
-  } catch {
-    // Email sending failed — account still created, user can request resend later
+  } catch (err) {
+    console.error("register: sendVerificationEmail failed", err)
   }
 
   return NextResponse.json({ message: "Account created. Check your email to verify." })

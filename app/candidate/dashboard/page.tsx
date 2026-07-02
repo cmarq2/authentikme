@@ -62,6 +62,10 @@ function DashboardInner() {
   const [discountError, setDiscountError] = useState("")
   const [discountSuccess, setDiscountSuccess] = useState(false)
 
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendError, setResendError] = useState("")
+  const [resendCooldown, setResendCooldown] = useState(0)
+
   const paymentResult = searchParams.get("payment")
 
   async function fetchStatus() {
@@ -73,6 +77,12 @@ function DashboardInner() {
     if (sessionStatus === "unauthenticated") { router.push("/login"); return }
     if (sessionStatus === "authenticated") fetchStatus()
   }, [sessionStatus])
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [resendCooldown])
 
   useEffect(() => {
     if (paymentResult === "success") {
@@ -121,6 +131,19 @@ function DashboardInner() {
       setDiscountError("Something went wrong. Please try again.")
     }
     setDiscountLoading(false)
+  }
+
+  async function handleResend() {
+    setResendLoading(true); setResendError("")
+    try {
+      const res = await fetch("/api/candidate/resend-verification", { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) { setResendError(data.error || "Failed to send. Please try again."); setResendLoading(false); return }
+      setResendCooldown(60)
+    } catch {
+      setResendError("Failed to send. Please try again.")
+    }
+    setResendLoading(false)
   }
 
   async function handleCaptcha(token: string | null) {
@@ -316,6 +339,10 @@ function DashboardInner() {
               discountSuccess={discountSuccess}
               setDiscountCode={setDiscountCode}
               onApplyDiscount={handleDiscount}
+              resendLoading={resendLoading}
+              resendError={resendError}
+              resendCooldown={resendCooldown}
+              onResend={handleResend}
             />
           )}
           {activeTab === "settings" && (
@@ -592,6 +619,7 @@ function VerificationTab({
   onPay, onCaptcha, onStartTotp, onVerifyTotp, setTotpToken, setTotpStep,
   allDone, copied, copyCode,
   discountCode, discountLoading, discountError, discountSuccess, setDiscountCode, onApplyDiscount,
+  resendLoading, resendError, resendCooldown, onResend,
 }: {
   userStatus: Status
   paymentResult: string | null
@@ -619,6 +647,10 @@ function VerificationTab({
   discountSuccess: boolean
   setDiscountCode: (v: string) => void
   onApplyDiscount: (e: React.FormEvent) => void
+  resendLoading: boolean
+  resendError: string
+  resendCooldown: number
+  onResend: () => void
 }) {
   return (
     <div className="max-w-2xl">
@@ -675,11 +707,28 @@ function VerificationTab({
       <div className="space-y-3">
         <PremiumStepCard number={1} title="Verify your email address" description="Confirm your email to prove it belongs to you." done={userStatus.emailVerified} delay="dash-delay-1">
           {!userStatus.emailVerified && (
-            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-              <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <p className="text-sm text-amber-800 font-medium">Check your inbox for a verification email and click the link inside.</p>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p className="text-sm text-amber-800 font-medium">Check your inbox for a verification email and click the link inside.</p>
+              </div>
+              <button
+                onClick={onResend}
+                disabled={resendLoading || resendCooldown > 0}
+                className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-6 rounded-xl disabled:opacity-60 text-sm transition-colors"
+              >
+                {resendLoading ? (
+                  <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Sending…</>
+                ) : resendCooldown > 0 ? (
+                  `Resend verification email (${resendCooldown}s)`
+                ) : (
+                  "Resend verification email"
+                )}
+              </button>
+              {resendError && <p className="text-xs text-red-500 text-center">{resendError}</p>}
+              {resendCooldown > 0 && !resendError && <p className="text-xs text-emerald-600 text-center">Verification email sent — check your inbox.</p>}
             </div>
           )}
         </PremiumStepCard>
