@@ -17,6 +17,7 @@ export default function HeaderNav() {
           <a href="#why" className="hover:text-gray-900 transition-colors">Why It Matters</a>
           <a href="#process" className="hover:text-gray-900 transition-colors">Process</a>
           <a href="#compare" className="hover:text-gray-900 transition-colors">Compare</a>
+          <Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -57,6 +58,9 @@ export default function HeaderNav() {
           <a href="#compare" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
             Compare
           </a>
+          <Link href="/contact" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
+            Contact
+          </Link>
           <div className="pt-1 border-t border-gray-100">
             <Link href="/login" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
               Sign in
