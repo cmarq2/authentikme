@@ -17,6 +17,8 @@ model User {
   emailVerified    Boolean  @default(false)
   emailToken       String?
   recaptchaDone    Boolean  @default(false)
+  idUploaded       Boolean  @default(false)
+  idDocumentUrl    String?
   totpSecret       String?
   totpEnabled      Boolean  @default(false)
   verificationCode String?  @unique

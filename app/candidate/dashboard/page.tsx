@@ -10,6 +10,7 @@ type Status = {
   stripePaid: boolean
   stripeSubscriptionId: string | null
   recaptchaDone: boolean
+  idUploaded: boolean
   totpEnabled: boolean
   verificationCode: string | null
   name: string | null
@@ -65,6 +66,10 @@ function DashboardInner() {
   const [resendLoading, setResendLoading] = useState(false)
   const [resendError, setResendError] = useState("")
   const [resendCooldown, setResendCooldown] = useState(0)
+
+  const [idPreview, setIdPreview] = useState<string | null>(null)
+  const [idUploading, setIdUploading] = useState(false)
+  const [idError, setIdError] = useState("")
 
   const paymentResult = searchParams.get("payment")
 
@@ -158,6 +163,40 @@ function DashboardInner() {
     fetchStatus()
   }
 
+  async function compressIdImage(file: File): Promise<Blob> {
+    const bitmap = await createImageBitmap(file)
+    const maxDim = 1600
+    const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height))
+    const width = Math.round(bitmap.width * scale)
+    const height = Math.round(bitmap.height * scale)
+    const canvas = document.createElement("canvas")
+    canvas.width = width
+    canvas.height = height
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, width, height)
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Compression failed"))), "image/jpeg", 0.82)
+    })
+  }
+
+  async function handleIdFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIdPreview(URL.createObjectURL(file))
+    setIdError(""); setIdUploading(true)
+    try {
+      const compressed = await compressIdImage(file)
+      const formData = new FormData()
+      formData.append("file", compressed, "id.jpg")
+      const res = await fetch("/api/candidate/upload-id", { method: "POST", body: formData })
+      const data = await res.json()
+      if (!res.ok) { setIdError(data.error || "Upload failed. Please try again."); setIdUploading(false); return }
+      fetchStatus()
+    } catch {
+      setIdError("Upload failed. Please try again.")
+    }
+    setIdUploading(false)
+  }
+
   async function startTotp() {
     setTotpStep("scan")
     const res = await fetch("/api/candidate/setup-totp")
@@ -188,10 +227,11 @@ function DashboardInner() {
 
   if (sessionStatus === "loading" || !userStatus) return <Spinner full />
 
-  const allDone = userStatus.emailVerified && userStatus.stripePaid && userStatus.recaptchaDone && userStatus.totpEnabled
+  const allDone = userStatus.emailVerified && userStatus.recaptchaDone && userStatus.idUploaded && userStatus.stripePaid && userStatus.totpEnabled
   const steps = [
     { key: "email",   label: "Email Verified", done: userStatus.emailVerified },
     { key: "captcha", label: "Human Check",     done: userStatus.recaptchaDone },
+    { key: "idUpload", label: "ID Uploaded",    done: userStatus.idUploaded },
     { key: "payment", label: "Fee Paid",        done: userStatus.stripePaid },
     { key: "totp",    label: "2FA Setup",        done: userStatus.totpEnabled },
   ]
@@ -343,6 +383,10 @@ function DashboardInner() {
               resendError={resendError}
               resendCooldown={resendCooldown}
               onResend={handleResend}
+              idPreview={idPreview}
+              idUploading={idUploading}
+              idError={idError}
+              onIdFileSelect={handleIdFileSelect}
             />
           )}
           {activeTab === "settings" && (
@@ -411,6 +455,12 @@ function OverviewTab({
     captcha: (
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+    idUpload: (
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     ),
     totp: (
@@ -620,6 +670,7 @@ function VerificationTab({
   allDone, copied, copyCode,
   discountCode, discountLoading, discountError, discountSuccess, setDiscountCode, onApplyDiscount,
   resendLoading, resendError, resendCooldown, onResend,
+  idPreview, idUploading, idError, onIdFileSelect,
 }: {
   userStatus: Status
   paymentResult: string | null
@@ -651,6 +702,10 @@ function VerificationTab({
   resendError: string
   resendCooldown: number
   onResend: () => void
+  idPreview: string | null
+  idUploading: boolean
+  idError: string
+  onIdFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
   return (
     <div className="max-w-2xl">
@@ -746,8 +801,47 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={3} title="Subscribe — $4.99/month" description="A monthly $4.99 subscription keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
-          {!userStatus.stripePaid && userStatus.recaptchaDone && (
+        <PremiumStepCard number={3} title="Upload a government-issued ID" description="Take a clear photo of your driver's license, passport, or state ID to confirm your identity." done={userStatus.idUploaded} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
+          {!userStatus.idUploaded && userStatus.recaptchaDone && (
+            <div className="space-y-3">
+              {idPreview && (
+                <div className="rounded-xl overflow-hidden border border-slate-200">
+                  <img src={idPreview} alt="ID preview" className="w-full max-h-56 object-cover" />
+                </div>
+              )}
+              <label
+                className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
+                  idUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "btn-shimmer text-white cursor-pointer"
+                }`}
+              >
+                {idUploading ? (
+                  <><div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Uploading…</>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {idPreview ? "Retake or choose another photo" : "Take or upload a photo of your ID"}
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  disabled={idUploading}
+                  onChange={onIdFileSelect}
+                />
+              </label>
+              <p className="text-xs text-slate-400 text-center">Accepted: driver&apos;s license, passport, or government ID. JPG, PNG, or WEBP.</p>
+              {idError && <p className="text-xs text-red-600 text-center">{idError}</p>}
+            </div>
+          )}
+        </PremiumStepCard>
+
+        <PremiumStepCard number={4} title="Subscribe — $4.99/month" description="A monthly $4.99 subscription keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.idUploaded} delay="dash-delay-4">
+          {!userStatus.stripePaid && userStatus.idUploaded && (
             <div className="space-y-4">
               <button
                 onClick={onPay}
@@ -789,7 +883,7 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={4} title="Set up Google Authenticator" description="Add two-factor authentication for maximum identity security." done={userStatus.totpEnabled} locked={!userStatus.stripePaid} delay="dash-delay-4">
+        <PremiumStepCard number={5} title="Set up Google Authenticator" description="Add two-factor authentication for maximum identity security." done={userStatus.totpEnabled} locked={!userStatus.stripePaid} delay="dash-delay-5">
           {!userStatus.totpEnabled && userStatus.stripePaid && (
             <div>
               {totpStep === "idle" && (

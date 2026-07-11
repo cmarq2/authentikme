@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import crypto from "crypto"
+import { allStepsDone, generateVerificationCode } from "@/lib/verification"
 
 const VALID_CODES: Record<string, string> = {
   FREE1202: "free_FREE1202",
@@ -26,10 +26,8 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 })
   if (user.stripePaid) return NextResponse.json({ error: "You already have an active subscription." }, { status: 400 })
 
-  const allStepsDone = user.emailVerified && user.recaptchaDone && user.totpEnabled
-  const verificationCode = allStepsDone
-    ? `ATK-${crypto.randomBytes(4).toString("hex").toUpperCase()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
-    : null
+  const done = allStepsDone({ ...user, stripePaid: true })
+  const verificationCode = done ? generateVerificationCode() : null
 
   await prisma.user.update({
     where: { id: session.user.id },

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { verifyTotpToken } from "@/lib/totp"
-import crypto from "crypto"
+import { allStepsDone, generateVerificationCode } from "@/lib/verification"
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -26,13 +26,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid code. Open your authenticator app and try again." }, { status: 400 })
   }
 
-  const allStepsDone = user.emailVerified && user.stripePaid && user.recaptchaDone
-  const verificationCode =
-    user.verificationCode ??
-    (allStepsDone
-      ? "ATK-" + crypto.randomBytes(4).toString("hex").toUpperCase() +
-        "-" + crypto.randomBytes(4).toString("hex").toUpperCase()
-      : null)
+  const done = allStepsDone({ ...user, totpEnabled: true })
+  const verificationCode = user.verificationCode ?? (done ? generateVerificationCode() : null)
 
   await prisma.user.update({
     where: { id: user.id },

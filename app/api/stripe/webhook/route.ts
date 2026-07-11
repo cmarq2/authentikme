@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { prisma } from "@/lib/prisma"
-import crypto from "crypto"
+import { allStepsDone, generateVerificationCode } from "@/lib/verification"
 
 export async function POST(req: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" })
@@ -23,10 +23,8 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user || user.stripePaid) return NextResponse.json({ ok: true })
 
-    const allStepsDone = user.emailVerified && user.recaptchaDone && user.totpEnabled
-    const verificationCode = allStepsDone
-      ? `ATK-${crypto.randomBytes(4).toString("hex").toUpperCase()}-${crypto.randomBytes(4).toString("hex").toUpperCase()}`
-      : null
+    const done = allStepsDone({ ...user, stripePaid: true })
+    const verificationCode = done ? generateVerificationCode() : null
 
     await prisma.user.update({
       where: { id: userId },
