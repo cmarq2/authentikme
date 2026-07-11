@@ -42,6 +42,7 @@ export async function POST() {
     subscription_data: {
       billing_cycle_anchor: nextSixteenthTimestamp(),
     },
+    allow_promotion_codes: true,
     metadata: { userId: session.user.id },
     success_url: `${process.env.NEXTAUTH_URL}/candidate/dashboard?payment=success`,
     cancel_url: `${process.env.NEXTAUTH_URL}/candidate/dashboard?payment=cancelled`,
