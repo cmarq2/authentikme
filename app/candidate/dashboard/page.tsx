@@ -192,8 +192,8 @@ function DashboardInner() {
   const steps = [
     { key: "email",   label: "Email Verified", done: userStatus.emailVerified },
     { key: "captcha", label: "Human Check",     done: userStatus.recaptchaDone },
-    { key: "totp",    label: "2FA Setup",        done: userStatus.totpEnabled },
     { key: "payment", label: "Fee Paid",        done: userStatus.stripePaid },
+    { key: "totp",    label: "2FA Setup",        done: userStatus.totpEnabled },
   ]
   const completedCount = steps.filter((s) => s.done).length
   const progressPct = Math.round((completedCount / steps.length) * 100)
@@ -746,8 +746,51 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={3} title="Set up Google Authenticator" description="Add two-factor authentication for maximum identity security." done={userStatus.totpEnabled} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
-          {!userStatus.totpEnabled && userStatus.recaptchaDone && (
+        <PremiumStepCard number={3} title="Subscribe — $4.99/month" description="A monthly $4.99 subscription keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
+          {!userStatus.stripePaid && userStatus.recaptchaDone && (
+            <div className="space-y-4">
+              <button
+                onClick={onPay}
+                disabled={paymentLoading}
+                className="w-full flex items-center justify-center gap-2 btn-shimmer text-white font-semibold py-3 px-6 rounded-xl disabled:opacity-60 text-sm"
+              >
+                {paymentLoading ? (
+                  <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Redirecting to payment…</>
+                ) : (
+                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Subscribe $4.99/mo with Stripe</>
+                )}
+              </button>
+              {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
+
+              {/* Discount code */}
+              <div className="border-t border-slate-100 pt-4">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Have a discount code?</p>
+                <form onSubmit={onApplyDiscount} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                    placeholder="Enter code"
+                    className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-mono font-semibold tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:normal-case placeholder:tracking-normal placeholder:font-normal"
+                    maxLength={20}
+                  />
+                  <button
+                    type="submit"
+                    disabled={discountLoading || !discountCode.trim()}
+                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50"
+                  >
+                    {discountLoading ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : "Apply"}
+                  </button>
+                </form>
+                {discountError && <p className="text-xs text-red-600 mt-2">{discountError}</p>}
+                {discountSuccess && <p className="text-xs text-emerald-600 font-semibold mt-2">Discount applied! Subscription activated.</p>}
+              </div>
+            </div>
+          )}
+        </PremiumStepCard>
+
+        <PremiumStepCard number={4} title="Set up Google Authenticator" description="Add two-factor authentication for maximum identity security." done={userStatus.totpEnabled} locked={!userStatus.stripePaid} delay="dash-delay-4">
+          {!userStatus.totpEnabled && userStatus.stripePaid && (
             <div>
               {totpStep === "idle" && (
                 <button onClick={onStartTotp} className="w-full btn-shimmer text-white font-semibold py-3 rounded-xl text-sm">
@@ -797,49 +840,6 @@ function VerificationTab({
                   </button>
                 </form>
               )}
-            </div>
-          )}
-        </PremiumStepCard>
-
-        <PremiumStepCard number={4} title="Subscribe — $4.99/month" description="A monthly $4.99 subscription keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.totpEnabled} delay="dash-delay-4">
-          {!userStatus.stripePaid && userStatus.totpEnabled && (
-            <div className="space-y-4">
-              <button
-                onClick={onPay}
-                disabled={paymentLoading}
-                className="w-full flex items-center justify-center gap-2 btn-shimmer text-white font-semibold py-3 px-6 rounded-xl disabled:opacity-60 text-sm"
-              >
-                {paymentLoading ? (
-                  <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Redirecting to payment…</>
-                ) : (
-                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Subscribe $4.99/mo with Stripe</>
-                )}
-              </button>
-              {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
-
-              {/* Discount code */}
-              <div className="border-t border-slate-100 pt-4">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Have a discount code?</p>
-                <form onSubmit={onApplyDiscount} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={discountCode}
-                    onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
-                    placeholder="Enter code"
-                    className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-mono font-semibold tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:normal-case placeholder:tracking-normal placeholder:font-normal"
-                    maxLength={20}
-                  />
-                  <button
-                    type="submit"
-                    disabled={discountLoading || !discountCode.trim()}
-                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-xl transition-colors disabled:opacity-50"
-                  >
-                    {discountLoading ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : "Apply"}
-                  </button>
-                </form>
-                {discountError && <p className="text-xs text-red-600 mt-2">{discountError}</p>}
-                {discountSuccess && <p className="text-xs text-emerald-600 font-semibold mt-2">Discount applied! Subscription activated.</p>}
-              </div>
             </div>
           )}
         </PremiumStepCard>
