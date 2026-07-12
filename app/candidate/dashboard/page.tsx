@@ -827,7 +827,7 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={3} title="Subscribe — $4.99/month" description="A monthly $4.99 subscription keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
+        <PremiumStepCard number={3} title="Subscribe — $4.99/month" description="This fee covers the cost of verifying your government-issued ID and keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
           {!userStatus.stripePaid && userStatus.recaptchaDone && (
             <div className="space-y-4">
               <button
@@ -842,6 +842,15 @@ function VerificationTab({
                 )}
               </button>
               {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
+
+              <div className="flex items-start gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
+                <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Your subscription funds the verification of your government-issued ID in the next step, along with the ongoing upkeep of your verified ATK badge.
+                </p>
+              </div>
 
               {/* Discount code */}
               <div className="border-t border-slate-100 pt-4">
