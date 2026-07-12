@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { prisma } from "@/lib/prisma"
 import { allStepsDone, generateVerificationCode } from "@/lib/verification"
+import { purgeIdDocumentIfVerified } from "@/lib/idDocument"
 
 export async function POST(req: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" })
@@ -36,6 +37,8 @@ export async function POST(req: Request) {
         ...(verificationCode ? { verificationCode } : {}),
       },
     })
+
+    await purgeIdDocumentIfVerified(userId)
   }
 
   // Subscription cancelled or expired — revoke access immediately

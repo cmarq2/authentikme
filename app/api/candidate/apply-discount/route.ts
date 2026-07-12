@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { allStepsDone, generateVerificationCode } from "@/lib/verification"
+import { purgeIdDocumentIfVerified } from "@/lib/idDocument"
 
 const VALID_CODES: Record<string, string> = {
   FREE1202: "free_FREE1202",
@@ -37,6 +38,8 @@ export async function POST(req: Request) {
       ...(verificationCode ? { verificationCode } : {}),
     },
   })
+
+  await purgeIdDocumentIfVerified(session.user.id)
 
   return NextResponse.json({ ok: true })
 }

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { put } from "@vercel/blob"
 import { allStepsDone, generateVerificationCode } from "@/lib/verification"
+import { purgeIdDocumentIfVerified } from "@/lib/idDocument"
 import crypto from "crypto"
 
 const MAX_SIZE_BYTES = 4 * 1024 * 1024 // 4MB
@@ -54,9 +55,12 @@ export async function POST(req: Request) {
     data: {
       idUploaded: true,
       idDocumentUrl: blob.url,
+      idUploadedAt: new Date(),
       ...(verificationCode ? { verificationCode } : {}),
     },
   })
+
+  await purgeIdDocumentIfVerified(session.user.id)
 
   return NextResponse.json({ message: "ID uploaded." })
 }

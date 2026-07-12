@@ -19,6 +19,7 @@ model User {
   recaptchaDone    Boolean  @default(false)
   idUploaded       Boolean  @default(false)
   idDocumentUrl    String?
+  idUploadedAt     DateTime?
   totpSecret       String?
   totpEnabled      Boolean  @default(false)
   verificationCode String?  @unique

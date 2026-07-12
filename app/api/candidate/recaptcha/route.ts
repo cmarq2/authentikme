@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { allStepsDone, generateVerificationCode } from "@/lib/verification"
+import { purgeIdDocumentIfVerified } from "@/lib/idDocument"
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -35,6 +36,8 @@ export async function POST(req: Request) {
     where: { id: session.user.id },
     data: { recaptchaDone: true, ...(verificationCode ? { verificationCode } : {}) },
   })
+
+  await purgeIdDocumentIfVerified(session.user.id)
 
   return NextResponse.json({ message: "reCAPTCHA verified" })
 }

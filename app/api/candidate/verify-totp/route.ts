@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { verifyTotpToken } from "@/lib/totp"
 import { allStepsDone, generateVerificationCode } from "@/lib/verification"
+import { purgeIdDocumentIfVerified } from "@/lib/idDocument"
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -33,6 +34,8 @@ export async function POST(req: Request) {
     where: { id: user.id },
     data: { totpEnabled: true, ...(verificationCode ? { verificationCode } : {}) },
   })
+
+  await purgeIdDocumentIfVerified(user.id)
 
   return NextResponse.json({ message: "Authenticator verified" })
 }
