@@ -877,7 +877,7 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={4} title="Upload a government-issued ID" description="Take a clear photo of your driver's license, passport, or state ID to confirm your identity. This information is never held for longer than 24 hours." done={userStatus.idUploaded} locked={!userStatus.stripePaid} delay="dash-delay-4">
+        <PremiumStepCard number={4} title="Upload a government-issued ID" description="Take a clear photo of your driver's license, passport, state ID, or other government-issued ID to confirm your identity. This information is never held for longer than 24 hours." done={userStatus.idUploaded} locked={!userStatus.stripePaid} delay="dash-delay-4">
           {!userStatus.idUploaded && userStatus.stripePaid && (
             <div className="space-y-3">
               {idPreview && (
