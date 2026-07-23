@@ -255,6 +255,10 @@ export default function SignupPage() {
                 I agree to the{" "}
                 <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
                   Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
+                  Privacy Policy
                 </Link>
                 {accountType === "candidate"
                   ? ", including the recurring monthly billing terms, and I authorize AuthentikMe to charge my payment method automatically each month until I cancel."

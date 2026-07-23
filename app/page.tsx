@@ -483,7 +483,7 @@ export default function Home() {
           </div>
           <p className="text-gray-600 text-sm">© 2026 AuthentikMe. All rights reserved.</p>
           <div className="flex gap-5 text-sm text-gray-600">
-            <a href="#" className="hover:text-gray-400 transition-colors">Privacy</a>
+            <a href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</a>
             <a href="/terms" className="hover:text-gray-400 transition-colors">Terms</a>
           </div>
         </div>
