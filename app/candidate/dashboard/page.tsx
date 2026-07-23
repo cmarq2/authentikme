@@ -827,7 +827,7 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={3} title="Subscribe — $4.99/month" description="This fee covers the cost of verifying your government-issued ID and keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
+        <PremiumStepCard number={3} title="Subscribe — $1.99/month" description="This fee covers the cost of verifying your government-issued ID and keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
           {!userStatus.stripePaid && userStatus.recaptchaDone && (
             <div className="space-y-4">
               <button
@@ -838,7 +838,7 @@ function VerificationTab({
                 {paymentLoading ? (
                   <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Redirecting to payment…</>
                 ) : (
-                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Subscribe $4.99/mo with Stripe</>
+                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Subscribe $1.99/mo with Stripe</>
                 )}
               </button>
               {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
@@ -1102,7 +1102,7 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
           <div className="px-6 py-4 flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-800">Subscription</p>
-              <p className="text-xs text-slate-500 mt-0.5">$4.99/month · billed on the 16th</p>
+              <p className="text-xs text-slate-500 mt-0.5">$1.99/month · billed on the 16th</p>
             </div>
             <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${
               userStatus.stripePaid
