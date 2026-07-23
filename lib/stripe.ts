@@ -41,15 +41,14 @@ export async function createSubscriptionCheckoutSession(
           unit_amount: Number(process.env.FIRST_PAYMENT_FEE_CENTS) || 199,
           product_data: {
             name: "First Payment",
-            description: "Initial verification fee for your first, partial billing period",
+            description: "One-time fee to activate your subscription today",
           },
         },
         quantity: 1,
       },
     ],
     subscription_data: {
-      billing_cycle_anchor: nextSixteenthTimestamp(),
-      proration_behavior: "none",
+      trial_end: nextSixteenthTimestamp(),
     },
     ...(promotionCodeId
       ? { discounts: [{ promotion_code: promotionCodeId }] }
