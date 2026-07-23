@@ -23,6 +23,8 @@ model User {
   totpSecret       String?
   totpEnabled      Boolean  @default(false)
   verificationCode String?  @unique
+  resetToken       String?  @unique
+  resetTokenExpiry DateTime?
   stripePaid           Boolean  @default(false)
   stripeSessionId      String?
   stripeCustomerId     String?

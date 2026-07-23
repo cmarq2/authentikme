@@ -64,3 +64,25 @@ export async function sendVerificationEmail(to: string, token: string) {
     `,
   })
 }
+
+export async function sendPasswordResetEmail(to: string, token: string) {
+  const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`
+  await transporter.sendMail({
+    from: `"AuthentikMe" <${process.env.SMTP_USER}>`,
+    to,
+    subject: "Reset your password – AuthentikMe",
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+        <div style="background:#1e3a8a;padding:16px 24px;border-radius:8px 8px 0 0;">
+          <h1 style="color:white;margin:0;font-size:20px;">AuthentikMe</h1>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-top:none;padding:32px;border-radius:0 0 8px 8px;">
+          <h2 style="color:#111827;margin-top:0;">Reset your password</h2>
+          <p style="color:#4b5563;">Click the button below to choose a new password for your AuthentikMe account.</p>
+          <a href="${resetUrl}" style="display:inline-block;background:#2563eb;color:white;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;margin:16px 0;">Reset Password</a>
+          <p style="color:#9ca3af;font-size:13px;margin-top:24px;">This link expires in 1 hour. If you didn't request a password reset, you can safely ignore this email.</p>
+        </div>
+      </div>
+    `,
+  })
+}
