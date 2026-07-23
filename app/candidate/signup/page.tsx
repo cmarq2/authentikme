@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -33,6 +34,10 @@ export default function SignupPage() {
       setError("Password must be at least 8 characters.")
       return
     }
+    if (!agreedToTerms) {
+      setError("You must agree to the Terms of Service to create an account.")
+      return
+    }
 
     setLoading(true)
     const fullName = `${firstName.trim()} ${lastName.trim()}`
@@ -42,7 +47,7 @@ export default function SignupPage() {
         const res = await fetch("/api/candidate/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: fullName, email, password }),
+          body: JSON.stringify({ name: fullName, email, password, agreedToTerms }),
         })
         const data = await res.json()
         if (!res.ok) { setError(data.error || "Something went wrong. Please try again."); return }
@@ -51,7 +56,7 @@ export default function SignupPage() {
         const res = await fetch("/api/employer/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: fullName, company, email, password }),
+          body: JSON.stringify({ name: fullName, company, email, password, agreedToTerms }),
         })
         const data = await res.json()
         if (!res.ok) { setError(data.error || "Something went wrong. Please try again."); return }
@@ -235,6 +240,26 @@ export default function SignupPage() {
               {confirmPassword && confirmPassword !== password && (
                 <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
               )}
+            </div>
+
+            {/* Terms agreement */}
+            <div className="flex items-start gap-2.5">
+              <input
+                id="agreedToTerms"
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={e => setAgreedToTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="agreedToTerms" className="text-sm text-gray-600">
+                I agree to the{" "}
+                <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
+                  Terms of Service
+                </Link>
+                {accountType === "candidate"
+                  ? ", including the recurring monthly billing terms, and I authorize AuthentikMe to charge my payment method automatically each month until I cancel."
+                  : "."}
+              </label>
             </div>
 
             {error && (

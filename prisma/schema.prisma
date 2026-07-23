@@ -15,6 +15,7 @@ model User {
   company          String?
   role             String   @default("CANDIDATE")
   emailVerified    Boolean  @default(false)
+  emailVerifiedAt  DateTime?
   emailToken       String?
   recaptchaDone    Boolean  @default(false)
   idUploaded       Boolean  @default(false)
@@ -29,6 +30,21 @@ model User {
   stripeSessionId      String?
   stripeCustomerId     String?
   stripeSubscriptionId String?
+  signupIp         String?
+  termsAcceptedAt  DateTime?
+  termsAcceptedIp  String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  loginEvents      LoginEvent[]
+}
+
+model LoginEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

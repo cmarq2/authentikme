@@ -11,7 +11,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null
 
         const user = await prisma.user.findUnique({
@@ -22,6 +22,16 @@ export const authOptions: NextAuthOptions = {
 
         const passwordValid = await bcrypt.compare(credentials.password, user.password)
         if (!passwordValid) return null
+
+        const headers = req?.headers as Record<string, string> | undefined
+        const forwardedFor = headers?.["x-forwarded-for"]
+        await prisma.loginEvent.create({
+          data: {
+            userId: user.id,
+            ipAddress: forwardedFor ? forwardedFor.split(",")[0].trim() : null,
+            userAgent: headers?.["user-agent"] ?? null,
+          },
+        })
 
         return {
           id: user.id,

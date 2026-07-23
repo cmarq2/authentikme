@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { emailVerified: true, emailToken: null },
+    data: { emailVerified: true, emailVerifiedAt: new Date(), emailToken: null },
   })
 
   return NextResponse.json({ message: "Email verified successfully" })
