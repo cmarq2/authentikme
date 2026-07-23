@@ -49,6 +49,16 @@ export async function POST(req: Request) {
     const subscription = event.data.object as Stripe.Subscription
     const customerId = subscription.customer as string
 
+    const affected = await prisma.user.findMany({ where: { stripeCustomerId: customerId } })
+    await prisma.subscriptionEvent.createMany({
+      data: affected.map((u) => ({
+        userId: u.id,
+        type: "canceled",
+        source: "stripe_webhook",
+        stripeSubscriptionId: subscription.id,
+      })),
+    })
+
     await prisma.user.updateMany({
       where: { stripeCustomerId: customerId },
       data: {
@@ -63,6 +73,16 @@ export async function POST(req: Request) {
   if (event.type === "invoice.payment_failed") {
     const invoice = event.data.object as Stripe.Invoice
     const customerId = invoice.customer as string
+
+    const affected = await prisma.user.findMany({ where: { stripeCustomerId: customerId } })
+    await prisma.subscriptionEvent.createMany({
+      data: affected.map((u) => ({
+        userId: u.id,
+        type: "payment_failed",
+        source: "stripe_webhook",
+        stripeSubscriptionId: u.stripeSubscriptionId,
+      })),
+    })
 
     await prisma.user.updateMany({
       where: { stripeCustomerId: customerId },

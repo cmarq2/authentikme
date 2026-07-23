@@ -35,7 +35,8 @@ model User {
   termsAcceptedIp  String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  loginEvents      LoginEvent[]
+  loginEvents        LoginEvent[]
+  subscriptionEvents  SubscriptionEvent[]
 }
 
 model LoginEvent {
@@ -45,6 +46,19 @@ model LoginEvent {
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model SubscriptionEvent {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type                 String   // "canceled" | "payment_failed"
+  source               String   // "user" (self-service cancel button) | "stripe_webhook"
+  ipAddress            String?
+  stripeSubscriptionId String?
+  createdAt            DateTime @default(now())
 
   @@index([userId])
 }

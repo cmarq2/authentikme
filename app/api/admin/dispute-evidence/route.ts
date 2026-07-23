@@ -20,6 +20,10 @@ export async function GET(req: Request) {
         orderBy: { createdAt: "desc" },
         take: 100,
       },
+      subscriptionEvents: {
+        orderBy: { createdAt: "desc" },
+        take: 100,
+      },
     },
   })
 
@@ -60,6 +64,13 @@ export async function GET(req: Request) {
       timestamp: event.createdAt,
       ipAddress: event.ipAddress,
       userAgent: event.userAgent,
+    })),
+    subscriptionHistory: user.subscriptionEvents.map((event) => ({
+      timestamp: event.createdAt,
+      type: event.type,
+      source: event.source,
+      ipAddress: event.ipAddress,
+      stripeSubscriptionId: event.stripeSubscriptionId,
     })),
   })
 }

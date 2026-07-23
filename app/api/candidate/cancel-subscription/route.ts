@@ -2,9 +2,10 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { getClientIp } from "@/lib/ip"
 import Stripe from "stripe"
 
-export async function POST() {
+export async function POST(req: Request) {
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json({ error: "Payment not configured." }, { status: 503 })
   }
@@ -24,6 +25,16 @@ export async function POST() {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" })
     await stripe.subscriptions.cancel(user.stripeSubscriptionId!)
   }
+
+  await prisma.subscriptionEvent.create({
+    data: {
+      userId: user.id,
+      type: "canceled",
+      source: "user",
+      ipAddress: getClientIp(req.headers),
+      stripeSubscriptionId: user.stripeSubscriptionId,
+    },
+  })
 
   await prisma.user.update({
     where: { id: session.user.id },
