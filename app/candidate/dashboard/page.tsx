@@ -71,7 +71,7 @@ function DashboardInner() {
   const [idUploading, setIdUploading] = useState(false)
   const [idError, setIdError] = useState("")
   const [idConfirming, setIdConfirming] = useState(false)
-  const [idConfirmProgress, setIdConfirmProgress] = useState(0)
+  const [idConfirmBarActive, setIdConfirmBarActive] = useState(false)
 
   const paymentResult = searchParams.get("payment")
 
@@ -182,19 +182,17 @@ function DashboardInner() {
 
   async function runIdConfirmation() {
     const duration = 12000
-    setIdConfirmProgress(0)
     setIdConfirming(true)
-    const start = performance.now()
-    await new Promise<void>((resolve) => {
-      function tick(now: number) {
-        const pct = Math.min(100, ((now - start) / duration) * 100)
-        setIdConfirmProgress(pct)
-        if (pct >= 100) { resolve(); return }
-        requestAnimationFrame(tick)
-      }
-      requestAnimationFrame(tick)
-    })
+    setIdConfirmBarActive(false)
+    // Two nested rAFs guarantee a paint at 0% happens before the width
+    // transition to 100% is triggered, so the CSS transition actually animates.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+    setIdConfirmBarActive(true)
+    // A plain timer (not rAF) so the wait reliably completes even if the tab
+    // is backgrounded — rAF can be paused entirely when a tab isn't visible.
+    await new Promise<void>((resolve) => setTimeout(resolve, duration))
     setIdConfirming(false)
+    setIdConfirmBarActive(false)
   }
 
   async function handleIdFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -409,7 +407,7 @@ function DashboardInner() {
               idUploading={idUploading}
               idError={idError}
               idConfirming={idConfirming}
-              idConfirmProgress={idConfirmProgress}
+              idConfirmBarActive={idConfirmBarActive}
               onIdFileSelect={handleIdFileSelect}
             />
           )}
@@ -694,7 +692,7 @@ function VerificationTab({
   allDone, copied, copyCode,
   discountCode, discountLoading, discountError, discountSuccess, setDiscountCode, onApplyDiscount,
   resendLoading, resendError, resendCooldown, onResend,
-  idPreview, idUploading, idError, idConfirming, idConfirmProgress, onIdFileSelect,
+  idPreview, idUploading, idError, idConfirming, idConfirmBarActive, onIdFileSelect,
 }: {
   userStatus: Status
   paymentResult: string | null
@@ -730,7 +728,7 @@ function VerificationTab({
   idUploading: boolean
   idError: string
   idConfirming: boolean
-  idConfirmProgress: number
+  idConfirmBarActive: boolean
   onIdFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
   return (
@@ -891,15 +889,13 @@ function VerificationTab({
               {idConfirming ? (
                 <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-5 space-y-3">
                   <div className="flex items-center justify-center gap-2">
-                    <svg className="w-4 h-4 text-blue-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
                     <span className="text-sm font-semibold text-blue-700">Confirming identity…</span>
                   </div>
                   <div className="h-2 rounded-full bg-blue-100 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
-                      style={{ width: `${idConfirmProgress}%`, transition: "width 100ms linear" }}
+                      style={{ width: idConfirmBarActive ? "100%" : "0%", transition: "width 12000ms linear" }}
                     />
                   </div>
                   <p className="text-xs text-blue-400 text-center">Matching document details, please wait…</p>
