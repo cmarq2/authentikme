@@ -11,6 +11,7 @@ type Status = {
   stripeSubscriptionId: string | null
   recaptchaDone: boolean
   idUploaded: boolean
+  idBackUploaded: boolean
   totpEnabled: boolean
   verificationCode: string | null
   name: string | null
@@ -72,6 +73,10 @@ function DashboardInner() {
   const [idError, setIdError] = useState("")
   const [idConfirming, setIdConfirming] = useState(false)
   const [idConfirmBarActive, setIdConfirmBarActive] = useState(false)
+
+  const [idBackPreview, setIdBackPreview] = useState<string | null>(null)
+  const [idBackUploading, setIdBackUploading] = useState(false)
+  const [idBackError, setIdBackError] = useState("")
 
   const paymentResult = searchParams.get("payment")
 
@@ -203,7 +208,8 @@ function DashboardInner() {
     try {
       const compressed = await compressIdImage(file)
       const formData = new FormData()
-      formData.append("file", compressed, "id.jpg")
+      formData.append("file", compressed, "id-front.jpg")
+      formData.append("side", "front")
       const res = await fetch("/api/candidate/upload-id", { method: "POST", body: formData })
       const data = await res.json()
       if (!res.ok) { setIdError(data.error || "Upload failed. Please try again."); setIdUploading(false); return }
@@ -215,6 +221,28 @@ function DashboardInner() {
       setIdError("Upload failed. Please try again.")
     }
     setIdUploading(false)
+  }
+
+  async function handleIdBackFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIdBackPreview(URL.createObjectURL(file))
+    setIdBackError(""); setIdBackUploading(true)
+    try {
+      const compressed = await compressIdImage(file)
+      const formData = new FormData()
+      formData.append("file", compressed, "id-back.jpg")
+      formData.append("side", "back")
+      const res = await fetch("/api/candidate/upload-id", { method: "POST", body: formData })
+      const data = await res.json()
+      if (!res.ok) { setIdBackError(data.error || "Upload failed. Please try again."); setIdBackUploading(false); return }
+      setIdBackUploading(false)
+      fetchStatus()
+      return
+    } catch {
+      setIdBackError("Upload failed. Please try again.")
+    }
+    setIdBackUploading(false)
   }
 
   async function startTotp() {
@@ -409,6 +437,10 @@ function DashboardInner() {
               idConfirming={idConfirming}
               idConfirmBarActive={idConfirmBarActive}
               onIdFileSelect={handleIdFileSelect}
+              idBackPreview={idBackPreview}
+              idBackUploading={idBackUploading}
+              idBackError={idBackError}
+              onIdBackFileSelect={handleIdBackFileSelect}
             />
           )}
           {activeTab === "settings" && (
@@ -693,6 +725,7 @@ function VerificationTab({
   discountCode, discountLoading, discountError, discountSuccess, setDiscountCode, onApplyDiscount,
   resendLoading, resendError, resendCooldown, onResend,
   idPreview, idUploading, idError, idConfirming, idConfirmBarActive, onIdFileSelect,
+  idBackPreview, idBackUploading, idBackError, onIdBackFileSelect,
 }: {
   userStatus: Status
   paymentResult: string | null
@@ -730,6 +763,10 @@ function VerificationTab({
   idConfirming: boolean
   idConfirmBarActive: boolean
   onIdFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
+  idBackPreview: string | null
+  idBackUploading: boolean
+  idBackError: string
+  onIdBackFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
   return (
     <div className="max-w-2xl">
@@ -877,68 +914,155 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={4} title="Upload a government-issued ID" description="Take a clear photo of your driver's license, passport, state ID, or other government-issued ID to confirm your identity. This information is never held for longer than 24 hours." done={userStatus.idUploaded} locked={!userStatus.stripePaid} delay="dash-delay-4">
-          {!userStatus.idUploaded && userStatus.stripePaid && (
-            <div className="space-y-3">
-              {idPreview && (
-                <div className="rounded-xl overflow-hidden border border-slate-200 relative">
-                  <img src={idPreview} alt="ID preview" className={`w-full max-h-56 object-cover transition-opacity ${idConfirming ? "opacity-40" : ""}`} />
-                </div>
-              )}
+        <PremiumStepCard number={4} title="Upload a government-issued ID" description="Take a clear photo of your driver's license, passport, state ID, or other government-issued ID to confirm your identity. This information is never held for longer than 24 hours." done={userStatus.idUploaded} locked={!userStatus.stripePaid} forceShowChildren delay="dash-delay-4">
+          {userStatus.stripePaid && (
+            <div className="space-y-5">
 
-              {idConfirming ? (
-                <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-5 space-y-3">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
-                    <span className="text-sm font-semibold text-blue-700">Confirming identity…</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-blue-100 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
-                      style={{ width: idConfirmBarActive ? "100%" : "0%", transition: "width 12000ms linear" }}
-                    />
-                  </div>
-                  <p className="text-xs text-blue-400 text-center">Matching document details, please wait…</p>
+              {/* Front — required */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Front of ID</p>
+                  <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full uppercase tracking-wide">Required</span>
                 </div>
-              ) : (
-                <>
-                  <label
-                    className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
-                      idUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "btn-shimmer text-white cursor-pointer"
-                    }`}
-                  >
-                    {idUploading ? (
-                      <><div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Uploading…</>
+
+                {userStatus.idUploaded ? (
+                  <div className="space-y-3">
+                    {idPreview && (
+                      <div className="rounded-xl overflow-hidden border border-slate-200">
+                        <img src={idPreview} alt="Front of ID preview" className="w-full max-h-56 object-cover" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+                      <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-sm font-semibold text-emerald-700">Front photo uploaded</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {idPreview && (
+                      <div className="rounded-xl overflow-hidden border border-slate-200 relative">
+                        <img src={idPreview} alt="Front of ID preview" className={`w-full max-h-56 object-cover transition-opacity ${idConfirming ? "opacity-40" : ""}`} />
+                      </div>
+                    )}
+
+                    {idConfirming ? (
+                      <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-5 space-y-3">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
+                          <span className="text-sm font-semibold text-blue-700">Confirming identity…</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-blue-100 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                            style={{ width: idConfirmBarActive ? "100%" : "0%", transition: "width 12000ms linear" }}
+                          />
+                        </div>
+                        <p className="text-xs text-blue-400 text-center">Matching document details, please wait…</p>
+                      </div>
                     ) : (
                       <>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {idPreview ? "Retake or choose another photo" : "Take or upload a photo of your ID"}
+                        <label
+                          className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
+                            idUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "btn-shimmer text-white cursor-pointer"
+                          }`}
+                        >
+                          {idUploading ? (
+                            <><div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Uploading…</>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              {idPreview ? "Retake or choose another photo" : "Take or upload a photo of the front"}
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            className="hidden"
+                            disabled={idUploading}
+                            onChange={onIdFileSelect}
+                          />
+                        </label>
+                        <p className="text-xs text-slate-400 text-center">Make sure your name and photo are clearly visible. JPG, PNG, or WEBP.</p>
+                        {idError && <p className="text-xs text-red-600 text-center">{idError}</p>}
                       </>
                     )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      disabled={idUploading}
-                      onChange={onIdFileSelect}
-                    />
-                  </label>
-                  <p className="text-xs text-slate-400 text-center">Accepted: driver&apos;s license, passport, or government ID. JPG, PNG, or WEBP.</p>
-                  {idError && <p className="text-xs text-red-600 text-center">{idError}</p>}
-                  <div className="flex items-start gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
-                    <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <p className="text-xs text-slate-500 leading-relaxed">
-                      Your ID is used only to confirm your identity. Once your verification is confirmed, the document is permanently deleted from our systems — we retain no copy of any government ID beyond 24 hours.
-                    </p>
+                  </>
+                )}
+              </div>
+
+              {/* Back — optional */}
+              <div className="space-y-3 border-t border-slate-100 pt-5">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Back of ID</p>
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full uppercase tracking-wide">Optional</span>
+                </div>
+
+                {userStatus.idBackUploaded ? (
+                  <div className="space-y-3">
+                    {idBackPreview && (
+                      <div className="rounded-xl overflow-hidden border border-slate-200">
+                        <img src={idBackPreview} alt="Back of ID preview" className="w-full max-h-56 object-cover" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+                      <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-sm font-semibold text-emerald-700">Back photo uploaded</p>
+                    </div>
                   </div>
-                </>
-              )}
+                ) : (
+                  <>
+                    {idBackPreview && (
+                      <div className="rounded-xl overflow-hidden border border-slate-200">
+                        <img src={idBackPreview} alt="Back of ID preview" className="w-full max-h-56 object-cover" />
+                      </div>
+                    )}
+                    <label
+                      className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
+                        idBackUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                      }`}
+                    >
+                      {idBackUploading ? (
+                        <><div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Uploading…</>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {idBackPreview ? "Retake or choose another photo" : "Take or upload a photo of the back"}
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        className="hidden"
+                        disabled={idBackUploading}
+                        onChange={onIdBackFileSelect}
+                      />
+                    </label>
+                    <p className="text-xs text-slate-400 text-center">Not required — add it only if your ID has details on both sides.</p>
+                    {idBackError && <p className="text-xs text-red-600 text-center">{idBackError}</p>}
+                  </>
+                )}
+              </div>
+
+              <div className="flex items-start gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
+                <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Your ID is used only to confirm your identity. Once your verification is confirmed, the document is permanently deleted from our systems — we retain no copy of any government ID beyond 24 hours.
+                </p>
+              </div>
             </div>
           )}
         </PremiumStepCard>
@@ -1189,7 +1313,7 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
 /* ─── Premium Step Card ─── */
 
 function PremiumStepCard({
-  number, title, description, done, locked = false, delay = "", children,
+  number, title, description, done, locked = false, delay = "", forceShowChildren = false, children,
 }: {
   number: number
   title: string
@@ -1197,6 +1321,7 @@ function PremiumStepCard({
   done: boolean
   locked?: boolean
   delay?: string
+  forceShowChildren?: boolean
   children?: React.ReactNode
 }) {
   return (
@@ -1244,7 +1369,7 @@ function PremiumStepCard({
           </div>
         </div>
 
-        {!done && !locked && children && (
+        {!locked && children && (!done || forceShowChildren) && (
           <div className="mt-4 ml-13">{children}</div>
         )}
       </div>

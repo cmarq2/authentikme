@@ -22,6 +22,7 @@ export async function POST(req: Request) {
 
   const formData = await req.formData()
   const file = formData.get("file")
+  const side = formData.get("side") === "back" ? "back" : "front"
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "No file provided." }, { status: 400 })
   }
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
   const user = await prisma.user.findUnique({ where: { id: session.user.id } })
   if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 })
 
-  const pathname = `id-documents/${session.user.id}/${crypto.randomUUID()}.${ext}`
+  const pathname = `id-documents/${session.user.id}/${side}-${crypto.randomUUID()}.${ext}`
 
   let blob
   try {
@@ -47,18 +48,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 502 })
   }
 
-  const done = allStepsDone({ ...user, idUploaded: true })
-  const verificationCode = user.verificationCode ?? (done ? generateVerificationCode() : null)
+  if (side === "back") {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        idBackUploaded: true,
+        idBackDocumentUrl: blob.url,
+        idBackUploadedAt: new Date(),
+      },
+    })
+  } else {
+    const done = allStepsDone({ ...user, idUploaded: true })
+    const verificationCode = user.verificationCode ?? (done ? generateVerificationCode() : null)
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: {
-      idUploaded: true,
-      idDocumentUrl: blob.url,
-      idUploadedAt: new Date(),
-      ...(verificationCode ? { verificationCode } : {}),
-    },
-  })
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        idUploaded: true,
+        idDocumentUrl: blob.url,
+        idUploadedAt: new Date(),
+        ...(verificationCode ? { verificationCode } : {}),
+      },
+    })
+  }
 
   await purgeIdDocumentIfVerified(session.user.id)
 

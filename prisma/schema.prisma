@@ -21,6 +21,9 @@ model User {
   idUploaded       Boolean  @default(false)
   idDocumentUrl    String?
   idUploadedAt     DateTime?
+  idBackUploaded   Boolean  @default(false)
+  idBackDocumentUrl String?
+  idBackUploadedAt DateTime?
   totpSecret       String?
   totpEnabled      Boolean  @default(false)
   verificationCode String?  @unique
