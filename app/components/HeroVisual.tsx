@@ -4,6 +4,7 @@ const steps = [
   { label: "Email Verified" },
   { label: "reCAPTCHA Passed" },
   { label: "Authenticator Setup" },
+  { label: "Government ID Analytics (AI)" },
 ]
 
 export default function HeroVisual() {
