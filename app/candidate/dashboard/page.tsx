@@ -77,6 +77,8 @@ function DashboardInner() {
   const [idBackPreview, setIdBackPreview] = useState<string | null>(null)
   const [idBackUploading, setIdBackUploading] = useState(false)
   const [idBackError, setIdBackError] = useState("")
+  const [idBackConfirming, setIdBackConfirming] = useState(false)
+  const [idBackConfirmBarActive, setIdBackConfirmBarActive] = useState(false)
 
   const paymentResult = searchParams.get("payment")
 
@@ -185,19 +187,19 @@ function DashboardInner() {
     })
   }
 
-  async function runIdConfirmation() {
+  async function runIdConfirmation(setConfirming: (v: boolean) => void, setBarActive: (v: boolean) => void) {
     const duration = 15000
-    setIdConfirming(true)
-    setIdConfirmBarActive(false)
+    setConfirming(true)
+    setBarActive(false)
     // Two nested rAFs guarantee a paint at 0% happens before the width
     // transition to 100% is triggered, so the CSS transition actually animates.
     await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
-    setIdConfirmBarActive(true)
+    setBarActive(true)
     // A plain timer (not rAF) so the wait reliably completes even if the tab
     // is backgrounded — rAF can be paused entirely when a tab isn't visible.
     await new Promise<void>((resolve) => setTimeout(resolve, duration))
-    setIdConfirming(false)
-    setIdConfirmBarActive(false)
+    setConfirming(false)
+    setBarActive(false)
   }
 
   async function handleIdFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -214,7 +216,7 @@ function DashboardInner() {
       const data = await res.json()
       if (!res.ok) { setIdError(data.error || "Upload failed. Please try again."); setIdUploading(false); return }
       setIdUploading(false)
-      await runIdConfirmation()
+      await runIdConfirmation(setIdConfirming, setIdConfirmBarActive)
       fetchStatus()
       return
     } catch {
@@ -237,6 +239,7 @@ function DashboardInner() {
       const data = await res.json()
       if (!res.ok) { setIdBackError(data.error || "Upload failed. Please try again."); setIdBackUploading(false); return }
       setIdBackUploading(false)
+      await runIdConfirmation(setIdBackConfirming, setIdBackConfirmBarActive)
       fetchStatus()
       return
     } catch {
@@ -440,6 +443,8 @@ function DashboardInner() {
               idBackPreview={idBackPreview}
               idBackUploading={idBackUploading}
               idBackError={idBackError}
+              idBackConfirming={idBackConfirming}
+              idBackConfirmBarActive={idBackConfirmBarActive}
               onIdBackFileSelect={handleIdBackFileSelect}
             />
           )}
@@ -725,7 +730,7 @@ function VerificationTab({
   discountCode, discountLoading, discountError, discountSuccess, setDiscountCode, onApplyDiscount,
   resendLoading, resendError, resendCooldown, onResend,
   idPreview, idUploading, idError, idConfirming, idConfirmBarActive, onIdFileSelect,
-  idBackPreview, idBackUploading, idBackError, onIdBackFileSelect,
+  idBackPreview, idBackUploading, idBackError, idBackConfirming, idBackConfirmBarActive, onIdBackFileSelect,
 }: {
   userStatus: Status
   paymentResult: string | null
@@ -766,6 +771,8 @@ function VerificationTab({
   idBackPreview: string | null
   idBackUploading: boolean
   idBackError: string
+  idBackConfirming: boolean
+  idBackConfirmBarActive: boolean
   onIdBackFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
   return (
@@ -1020,37 +1027,56 @@ function VerificationTab({
                 ) : (
                   <>
                     {idBackPreview && (
-                      <div className="rounded-xl overflow-hidden border border-slate-200">
-                        <img src={idBackPreview} alt="Back of ID preview" className="w-full max-h-56 object-cover" />
+                      <div className="rounded-xl overflow-hidden border border-slate-200 relative">
+                        <img src={idBackPreview} alt="Back of ID preview" className={`w-full max-h-56 object-cover transition-opacity ${idBackConfirming ? "opacity-40" : ""}`} />
                       </div>
                     )}
-                    <label
-                      className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
-                        idBackUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
-                      }`}
-                    >
-                      {idBackUploading ? (
-                        <><div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Uploading…</>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {idBackPreview ? "Retake or choose another photo" : "Take or upload a photo of the back"}
-                        </>
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        className="hidden"
-                        disabled={idBackUploading}
-                        onChange={onIdBackFileSelect}
-                      />
-                    </label>
-                    <p className="text-xs text-slate-400 text-center">Not required — add it only if your ID has details on both sides.</p>
-                    {idBackError && <p className="text-xs text-red-600 text-center">{idBackError}</p>}
+
+                    {idBackConfirming ? (
+                      <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-5 space-y-3">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
+                          <span className="text-sm font-semibold text-blue-700">AI verification in progress…</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-blue-100 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                            style={{ width: idBackConfirmBarActive ? "100%" : "0%", transition: "width 15000ms linear" }}
+                          />
+                        </div>
+                        <p className="text-xs text-blue-400 text-center">Our AI is verifying your document and screening for signs of fraud or tampering…</p>
+                      </div>
+                    ) : (
+                      <>
+                        <label
+                          className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
+                            idBackUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                          }`}
+                        >
+                          {idBackUploading ? (
+                            <><div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Uploading…</>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              {idBackPreview ? "Retake or choose another photo" : "Take or upload a photo of the back"}
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            className="hidden"
+                            disabled={idBackUploading}
+                            onChange={onIdBackFileSelect}
+                          />
+                        </label>
+                        <p className="text-xs text-slate-400 text-center">Not required — add it only if your ID has details on both sides.</p>
+                        {idBackError && <p className="text-xs text-red-600 text-center">{idBackError}</p>}
+                      </>
+                    )}
                   </>
                 )}
               </div>
