@@ -186,7 +186,7 @@ function DashboardInner() {
   }
 
   async function runIdConfirmation() {
-    const duration = 12000
+    const duration = 15000
     setIdConfirming(true)
     setIdConfirmBarActive(false)
     // Two nested rAFs guarantee a paint at 0% happens before the width
@@ -951,15 +951,15 @@ function VerificationTab({
                       <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-5 space-y-3">
                         <div className="flex items-center justify-center gap-2">
                           <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
-                          <span className="text-sm font-semibold text-blue-700">Confirming identity…</span>
+                          <span className="text-sm font-semibold text-blue-700">AI verification in progress…</span>
                         </div>
                         <div className="h-2 rounded-full bg-blue-100 overflow-hidden">
                           <div
                             className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
-                            style={{ width: idConfirmBarActive ? "100%" : "0%", transition: "width 12000ms linear" }}
+                            style={{ width: idConfirmBarActive ? "100%" : "0%", transition: "width 15000ms linear" }}
                           />
                         </div>
-                        <p className="text-xs text-blue-400 text-center">Matching document details, please wait…</p>
+                        <p className="text-xs text-blue-400 text-center">Our AI is verifying your document and screening for signs of fraud or tampering…</p>
                       </div>
                     ) : (
                       <>
