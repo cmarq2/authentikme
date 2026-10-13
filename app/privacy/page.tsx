@@ -34,12 +34,12 @@ export default function PrivacyPage() {
             <p className="mb-2">
               <strong>Payment information:</strong> processed directly by our payment provider, Stripe.
               We do not receive or store your card number; we retain only Stripe-issued references
-              (customer ID, subscription ID, session ID) needed to manage your subscription.
+              (customer ID, session ID, and subscription ID for legacy monthly plans) needed to manage your payment.
             </p>
             <p>
               <strong>Technical and account activity data:</strong> your IP address at signup and at the
               moment you accept our Terms of Service, IP address and device/browser information for each
-              login, and records of subscription changes (including cancellations).
+              login, and records of payment and subscription changes (including cancellations).
             </p>
           </section>
 
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-2">3. How We Use Your Information</h2>
             <p>
               We use your information to create and secure your account, verify your identity, process
-              subscription payments, communicate with you (account verification, password resets, and
+              payments, communicate with you (account verification, password resets, and
               service-related notices), maintain the security and integrity of the service, and respond to
               payment disputes or fraud investigations.
             </p>
@@ -100,11 +100,11 @@ export default function PrivacyPage() {
               <a href="mailto:noreply@authentikme.com" className="text-blue-600 hover:underline">
                 noreply@authentikme.com
               </a>
-              . You can cancel your subscription at any time from your account dashboard; see our{" "}
+              . Verification is a one-time fee with no subscription; see our{" "}
               <Link href="/terms" className="text-blue-600 hover:underline">
                 Terms of Service
               </Link>{" "}
-              for details on cancellation and billing.
+              for billing details.
             </p>
           </section>
 

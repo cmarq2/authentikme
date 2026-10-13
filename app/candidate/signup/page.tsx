@@ -176,7 +176,7 @@ export default function SignupPage() {
             and{" "}
             <Link href="/privacy" target="_blank" className="auth-link">Privacy Policy</Link>
             {accountType === "candidate"
-              ? ", including the recurring monthly billing terms, and I authorize AuthentikMe to charge my payment method automatically each month until I cancel."
+              ? ", including the one-time $19.99 verification fee charged when I complete the payment step."
               : "."}
           </label>
         </div>

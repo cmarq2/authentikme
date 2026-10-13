@@ -41,32 +41,30 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">3. Recurring Billing</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">3. Fees</h2>
             <p>
-              The AuthentikMe Identity Verification subscription is billed monthly at the price displayed
-              at checkout. By subscribing, you authorize AuthentikMe to automatically charge your payment
-              method on file each billing period until you cancel. A one-time first payment may be charged
-              at signup to activate your subscription; recurring charges begin on the billing date shown at
-              checkout and continue monthly thereafter. Prices are shown in USD and may change with notice
-              posted to this page or communicated to the email on file.
+              AuthentikMe Identity Verification is a one-time fee of $19.99 USD, charged once when you
+              complete the payment step of verification. There is no subscription and no recurring charge.
+              Prices may change with notice posted to this page; any change does not affect fees already
+              paid. Accounts that signed up under a previous monthly plan continue to be billed under that
+              plan until it is cancelled.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">4. Cancellation</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">4. Legacy Monthly Plans</h2>
             <p>
-              You may cancel your subscription at any time from your account dashboard. Cancellation takes
-              effect immediately: your subscription is terminated at the moment you cancel, no further
-              charges will be made, and your verified badge/code is deactivated. Because cancellation is
-              immediate rather than deferred to the end of a billing period, no additional action is needed
-              to stop future charges once you cancel.
+              If your account is on a previous monthly subscription, you may cancel it at any time from your
+              account dashboard. Cancellation takes effect immediately: your subscription is terminated at
+              the moment you cancel, no further charges will be made, and your verified badge/code is
+              deactivated.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">5. Refund Policy</h2>
             <p>
-              Payments are non-refundable, including partial-month or unused-period amounts, except where
+              Payments are non-refundable, including the one-time verification fee, except where
               required by law. If you believe you were charged in error, contact us first at{" "}
               <a href="mailto:noreply@authentikme.com" className="text-blue-600 hover:underline">
                 noreply@authentikme.com

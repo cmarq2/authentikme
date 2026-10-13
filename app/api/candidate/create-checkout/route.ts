@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { getStripe, createSubscriptionCheckoutSession } from "@/lib/stripe"
+import { getStripe, createVerificationCheckoutSession } from "@/lib/stripe"
 
 export async function POST() {
   const stripe = getStripe()
@@ -13,7 +13,7 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const checkoutSession = await createSubscriptionCheckoutSession(stripe, session.user.id)
+  const checkoutSession = await createVerificationCheckoutSession(stripe, session.user.id)
 
   return NextResponse.json({ url: checkoutSession.url })
 }

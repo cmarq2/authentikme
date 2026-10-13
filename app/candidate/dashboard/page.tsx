@@ -749,7 +749,7 @@ function VerificationTab({
           )}
         </PremiumStepCard>
 
-        <PremiumStepCard number={3} title="Subscribe — $1.99/month" description="This fee covers the cost of verifying your government-issued ID and keeps your verified badge and ATK code active." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
+        <PremiumStepCard number={3} title="Verification fee — $19.99" description="A one-time payment that covers verifying your government-issued ID and issuing your verified badge and ATK code. No subscription, no recurring charges." done={userStatus.stripePaid} locked={!userStatus.recaptchaDone} delay="dash-delay-3">
           {!userStatus.stripePaid && userStatus.recaptchaDone && (
             <div className="space-y-4">
               <button
@@ -760,7 +760,7 @@ function VerificationTab({
                 {paymentLoading ? (
                   <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Redirecting to payment…</>
                 ) : (
-                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Subscribe $1.99/mo with Stripe</>
+                  <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg> Pay $19.99 with Stripe</>
                 )}
               </button>
               {paymentError && <p className="text-xs text-red-600 text-center">{paymentError}</p>}
@@ -770,7 +770,7 @@ function VerificationTab({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Your subscription funds the verification of your government-issued ID in the next step, along with the ongoing upkeep of your verified ATK badge.
+                  One-time payment — you will never be billed again. It funds the verification of your government-issued ID in the next step and issues your verified ATK badge.
                 </p>
               </div>
 
@@ -795,7 +795,7 @@ function VerificationTab({
                   </button>
                 </form>
                 {discountError && <p className="text-xs text-red-600 mt-2">{discountError}</p>}
-                {discountSuccess && <p className="text-xs text-emerald-600 font-semibold mt-2">Discount applied! Subscription activated.</p>}
+                {discountSuccess && <p className="text-xs text-emerald-600 font-semibold mt-2">Discount applied! Fee waived.</p>}
               </div>
             </div>
           )}
@@ -1038,6 +1038,8 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelError, setCancelError] = useState("")
   const [cancelConfirm, setCancelConfirm] = useState(false)
+  // Accounts from before the switch to a one-time fee still carry a recurring Stripe subscription.
+  const legacySubscription = !!userStatus.stripeSubscriptionId?.startsWith("sub_")
 
   async function handleCancel() {
     setCancelLoading(true)
@@ -1058,7 +1060,7 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
     <div className="max-w-2xl">
       <DashHeading
         title={<>Account <span className="gradient-text text-[1.08em]">settings.</span></>}
-        subtitle="Manage your profile, security, and subscription."
+        subtitle="Manage your profile, security, and billing."
       />
 
       {/* Profile */}
@@ -1127,22 +1129,22 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
           </div>
           <div className="px-6 py-4 flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-800">Subscription</p>
-              <p className="text-xs text-slate-500 mt-0.5">$1.99/month · billed on the 16th</p>
+              <p className="text-sm font-semibold text-slate-800">{legacySubscription ? "Subscription" : "Verification fee"}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{legacySubscription ? "Monthly plan · billed on the 16th" : "$19.99 · one-time payment"}</p>
             </div>
             <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${
               userStatus.stripePaid
                 ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
                 : "bg-amber-50 text-amber-700 border border-amber-100"
             }`}>
-              {userStatus.stripePaid ? "Active" : "Inactive"}
+              {userStatus.stripePaid ? (legacySubscription ? "Active" : "Paid") : (legacySubscription ? "Inactive" : "Unpaid")}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Subscription management */}
-      {userStatus.stripePaid && (
+      {/* Subscription management (legacy monthly subscribers only) */}
+      {userStatus.stripePaid && legacySubscription && (
         <div className="bg-white rounded-[22px] border border-rose-200/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)] mb-4 overflow-hidden dash-enter dash-delay-3">
           <div className="px-6 py-4 border-b border-red-50 flex items-center gap-2">
             <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1193,7 +1195,7 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
       )}
 
       {/* Account */}
-      <div className={`bg-white rounded-[22px] border border-slate-900/[0.06] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-16px_rgba(15,23,42,0.12)] overflow-hidden dash-enter ${userStatus.stripePaid ? "dash-delay-4" : "dash-delay-3"}`}>
+      <div className={`bg-white rounded-[22px] border border-slate-900/[0.06] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-16px_rgba(15,23,42,0.12)] overflow-hidden dash-enter ${userStatus.stripePaid && legacySubscription ? "dash-delay-4" : "dash-delay-3"}`}>
         <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
           <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

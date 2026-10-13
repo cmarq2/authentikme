@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } })
   if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 })
-  if (user.stripePaid) return NextResponse.json({ error: "You already have an active subscription." }, { status: 400 })
+  if (user.stripePaid) return NextResponse.json({ error: "You have already paid the verification fee." }, { status: 400 })
 
   const done = allStepsDone({ ...user, stripePaid: true })
   const verificationCode = done ? generateVerificationCode() : null

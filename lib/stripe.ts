@@ -1,59 +1,40 @@
 import Stripe from "stripe"
 
+/** One-time candidate verification fee, in cents. */
+export const VERIFICATION_FEE_CENTS = 1999
+
 export function getStripe(): Stripe | null {
   if (!process.env.STRIPE_SECRET_KEY) return null
   return new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2026-06-24.dahlia" })
 }
 
-function nextSixteenthTimestamp(): number {
-  const now = new Date()
-  const anchor = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 16))
-  if (anchor.getTime() <= now.getTime()) {
-    anchor.setUTCMonth(anchor.getUTCMonth() + 1)
-  }
-  return Math.floor(anchor.getTime() / 1000)
-}
-
-export async function createSubscriptionCheckoutSession(
+export async function createVerificationCheckoutSession(
   stripe: Stripe,
   userId: string,
   promotionCodeId?: string
 ) {
   return stripe.checkout.sessions.create({
     payment_method_types: ["card"],
-    mode: "subscription",
+    mode: "payment",
+    customer_creation: "always",
     line_items: [
       {
         price_data: {
           currency: "usd",
-          unit_amount: Number(process.env.VERIFICATION_FEE_CENTS) || 499,
-          recurring: { interval: "month" },
+          unit_amount: VERIFICATION_FEE_CENTS,
           product_data: {
             name: "AuthentikMe Identity Verification",
-            description: "Monthly subscription to maintain your verified ATK identity badge",
-          },
-        },
-        quantity: 1,
-      },
-      {
-        price_data: {
-          currency: "usd",
-          unit_amount: Number(process.env.FIRST_PAYMENT_FEE_CENTS) || 199,
-          product_data: {
-            name: "First Payment",
-            description: "One-time fee to activate your subscription today",
+            description: "One-time fee to verify your identity and issue your verified ATK badge",
           },
         },
         quantity: 1,
       },
     ],
-    subscription_data: {
-      trial_end: nextSixteenthTimestamp(),
-    },
     ...(promotionCodeId
       ? { discounts: [{ promotion_code: promotionCodeId }] }
       : { allow_promotion_codes: true }),
     metadata: { userId },
+    payment_intent_data: { metadata: { userId } },
     success_url: `${process.env.NEXTAUTH_URL}/candidate/dashboard?payment=success`,
     cancel_url: `${process.env.NEXTAUTH_URL}/candidate/dashboard?payment=cancelled`,
   })
