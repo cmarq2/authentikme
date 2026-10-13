@@ -1,36 +1,68 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+
+const navLinks = [
+  { href: "#why", label: "Why It Matters" },
+  { href: "#process", label: "Process" },
+  { href: "#compare", label: "Compare" },
+]
+
+export function LogoMark({ className = "w-7 h-7" }: { className?: string }) {
+  return (
+    <span className={`${className} rounded-lg bg-gradient-to-b from-blue-600 to-indigo-700 flex items-center justify-center shadow-sm shadow-blue-900/20`}>
+      <svg className="w-[60%] h-[60%] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    </span>
+  )
+}
 
 export default function HeaderNav() {
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <a href="#" className="font-extrabold text-xl tracking-tight text-gray-900 hover:opacity-80 transition-opacity">
-          Authentik<span className="text-blue-600">Me</span>
+    <header
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+        scrolled || open
+          ? "bg-white/85 backdrop-blur-xl border-b border-slate-900/5 shadow-[0_1px_0_rgba(15,23,42,0.02)]"
+          : "bg-transparent border-b border-transparent"
+      }`}
+    >
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
+        <a href="#" className="flex items-center gap-2.5 font-semibold text-[19px] tracking-tight text-slate-900 hover:opacity-80 transition-opacity">
+          <LogoMark />
+          <span>Authentik<span className="text-blue-600">Me</span></span>
         </a>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
-          <a href="#why" className="hover:text-gray-900 transition-colors">Why It Matters</a>
-          <a href="#process" className="hover:text-gray-900 transition-colors">Process</a>
-          <a href="#compare" className="hover:text-gray-900 transition-colors">Compare</a>
-          <Link href="/contact" className="hover:text-gray-900 transition-colors">Contact</Link>
+        <nav className="hidden md:flex items-center gap-9 text-[14px] text-slate-600">
+          {navLinks.map(l => (
+            <a key={l.href} href={l.href} className="hover:text-slate-900 transition-colors">{l.label}</a>
+          ))}
+          <Link href="/contact" className="hover:text-slate-900 transition-colors">Contact</Link>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors hidden sm:block">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link href="/login" className="text-[14px] font-medium text-slate-700 hover:text-slate-900 transition-colors hidden sm:block px-3 py-2">
             Sign in
           </Link>
-          <Link href="/candidate/signup" className="btn-shimmer text-white text-sm font-semibold px-4 sm:px-5 py-2.5 rounded-xl">
+          <Link href="/candidate/signup" className="bg-slate-900 text-white text-[14px] font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-slate-800 transition-colors shadow-sm">
             Get Verified
           </Link>
           {/* Hamburger — mobile only */}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+            className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             aria-label="Toggle menu"
           >
             {open ? (
@@ -48,21 +80,17 @@ export default function HeaderNav() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-xl px-4 py-3 space-y-1">
-          <a href="#why" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
-            Why It Matters
-          </a>
-          <a href="#process" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
-            Process
-          </a>
-          <a href="#compare" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
-            Compare
-          </a>
-          <Link href="/contact" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
+        <div className="md:hidden border-t border-slate-100 bg-white px-4 py-3 space-y-1">
+          {navLinks.map(l => (
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
+              {l.label}
+            </a>
+          ))}
+          <Link href="/contact" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
             Contact
           </Link>
-          <div className="pt-1 border-t border-gray-100">
-            <Link href="/login" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">
+          <div className="pt-1 border-t border-slate-100">
+            <Link href="/login" onClick={() => setOpen(false)} className="block px-4 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
               Sign in
             </Link>
           </div>

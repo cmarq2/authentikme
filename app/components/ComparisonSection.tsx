@@ -50,13 +50,11 @@ export default function ComparisonSection() {
             transition: "opacity 0.7s ease, transform 0.7s ease",
           }}
         >
-          <div className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 text-gray-600 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest">
-            The Difference Is Clear
-          </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4 leading-tight">
-            Unverified vs. Verified.
+          <p className="eyebrow text-slate-500 mb-6">The Difference Is Clear</p>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-[-0.035em] leading-[1.05] text-slate-900 mb-5">
+            Unverified vs. <span className="gradient-text text-[1.08em]">Verified.</span>
           </h2>
-          <p className="text-gray-700 text-lg max-w-lg mx-auto leading-relaxed">
+          <p className="text-slate-600 text-lg max-w-lg mx-auto leading-relaxed">
             Employers don&apos;t see your effort — they see your signal. Make it the right one.
           </p>
         </div>
@@ -217,7 +215,7 @@ export default function ComparisonSection() {
         >
           <Link
             href="/candidate/signup"
-            className="btn-shimmer inline-flex items-center text-white font-bold px-8 py-4 rounded-2xl text-sm"
+            className="btn-shimmer inline-flex items-center text-white font-medium px-8 py-4 rounded-full text-[15px]"
           >
             Become a Verified Candidate →
           </Link>

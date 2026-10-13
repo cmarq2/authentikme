@@ -72,7 +72,7 @@ export default function HowItWorks() {
     <section
       ref={ref}
       className="relative py-16 sm:py-28 px-4 sm:px-6 overflow-hidden"
-      style={{ background: "linear-gradient(160deg, #0c1220 0%, #0a0f1e 50%, #0c1220 100%)" }}
+      style={{ background: "#020617" }}
     >
       {/* Ambient glows */}
       <div className="absolute inset-0 pointer-events-none">
@@ -100,15 +100,11 @@ export default function HowItWorks() {
             transition: "opacity 0.8s ease, transform 0.8s ease",
           }}
         >
-          <div className="inline-flex items-center gap-2 border text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest"
-            style={{ borderColor: "rgba(59,130,246,0.3)", background: "rgba(59,130,246,0.08)", color: "#60A5FA" }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            How It Works
-          </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight">
-            Three steps to <span className="gradient-text">standing out.</span>
+          <p className="eyebrow text-blue-300 mb-6">How It Works</p>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-[-0.035em] leading-[1.05] text-white mb-5">
+            Three steps to <span className="gradient-text-light text-[1.08em]">standing out.</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-lg mx-auto leading-relaxed">
+          <p className="text-slate-400 text-lg max-w-lg mx-auto leading-relaxed">
             From unknown applicant to trusted candidate — verified in minutes.
           </p>
         </div>

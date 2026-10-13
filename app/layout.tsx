@@ -1,9 +1,15 @@
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Instrument_Serif } from "next/font/google"
 import "./globals.css"
 import { Providers } from "./providers"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+})
 
 const siteUrl = "https://www.authentikme.com"
 const title = "AuthentikMe – Identity Verification for Job Seekers"
@@ -55,7 +61,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen`}>
+      <body className={`${inter.className} ${inter.variable} ${serif.variable} min-h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>

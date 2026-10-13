@@ -41,7 +41,7 @@ export default function CountUp({ to, prefix = "", suffix = "", duration = 1800,
 
   return (
     <span ref={ref}>
-      {prefix}{decimals ? value.toFixed(decimals) : Math.round(value)}{suffix}
+      {prefix}{decimals ? value.toFixed(decimals) : Math.round(value).toLocaleString("en-US")}{suffix}
     </span>
   )
 }
