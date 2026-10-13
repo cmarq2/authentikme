@@ -1,8 +1,9 @@
-﻿"use client"
+"use client"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import AuthShell from "../components/AuthShell"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -42,77 +43,71 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-blue-900">
-            Authentik<span className="text-blue-500">Me</span>
-          </Link>
-          <p className="text-gray-700 mt-2">Sign in to your account</p>
+    <AuthShell
+      panel="signin"
+      title={<>Welcome <span className="gradient-text text-[1.08em]">back.</span></>}
+      subtitle="Sign in to manage your verification or confirm a candidate."
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label htmlFor="login-email" className="auth-label">Email address</label>
+          <input
+            id="login-email"
+            type="email"
+            required
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="auth-input"
+            placeholder="you@example.com"
+          />
         </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-700">Password</label>
-                <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60"
-            >
-              {loading ? "Signing in…" : "Sign In"}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center text-sm text-gray-700 space-y-2">
-            <p>
-              New candidate?{" "}
-              <Link href="/candidate/signup" className="text-blue-600 hover:underline font-medium">
-                Create account
-              </Link>
-            </p>
-            <p>
-              New employer?{" "}
-              <Link href="/employer/signup" className="text-blue-600 hover:underline font-medium">
-                Register company
-              </Link>
-            </p>
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label htmlFor="login-password" className="auth-label !mb-0">Password</label>
+            <Link href="/forgot-password" className="auth-link text-[13px]">
+              Forgot password?
+            </Link>
           </div>
+          <input
+            id="login-password"
+            type="password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="auth-input"
+            placeholder="••••••••"
+          />
         </div>
+
+        {error && <div className="auth-error">{error}</div>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full btn-shimmer text-white font-medium py-4 rounded-full text-[15px] disabled:opacity-60 disabled:pointer-events-none"
+        >
+          {loading ? "Signing in…" : "Sign in"}
+        </button>
+      </form>
+
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-900/[0.08]" /></div>
+        <p className="relative mx-auto w-fit bg-[#F8F7F4] px-3 text-xs font-medium uppercase tracking-[0.16em] text-slate-400">New here?</p>
       </div>
-    </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link href="/candidate/signup" className="group rounded-2xl border border-slate-900/[0.08] bg-white px-4 py-3.5 hover:border-blue-500/40 hover:shadow-md transition-all">
+          <p className="text-[14px] font-medium text-slate-900">I&apos;m a candidate</p>
+          <p className="text-[12px] text-slate-500">Get verified <span className="inline-block transition-transform group-hover:translate-x-0.5">→</span></p>
+        </Link>
+        <Link href="/employer/signup" className="group rounded-2xl border border-slate-900/[0.08] bg-white px-4 py-3.5 hover:border-blue-500/40 hover:shadow-md transition-all">
+          <p className="text-[14px] font-medium text-slate-900">I&apos;m an employer</p>
+          <p className="text-[12px] text-slate-500">Register your company <span className="inline-block transition-transform group-hover:translate-x-0.5">→</span></p>
+        </Link>
+      </div>
+    </AuthShell>
   )
 }
 

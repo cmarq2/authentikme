@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import Link from "next/link"
+import AuthShell, { AuthSuccess } from "../../components/AuthShell"
 
 type AccountType = "candidate" | "employer"
 
@@ -71,228 +72,134 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="w-full max-w-md text-center">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {accountType === "candidate" ? "Check your email" : "Account created!"}
-            </h2>
-            <p className="text-gray-700 text-sm mb-6">
-              {accountType === "candidate"
-                ? <>We sent a verification link to <strong>{email}</strong>. Click it to continue your setup.</>
-                : <>Your employer account is ready. You can now sign in.</>}
-            </p>
-            <Link href="/login" className="btn-shimmer inline-block text-white font-semibold px-8 py-3 rounded-xl text-sm">
-              Go to Sign In
-            </Link>
-          </div>
-        </div>
-      </div>
+      <AuthSuccess
+        tone="success"
+        title={accountType === "candidate" ? "Check your email" : "Account created!"}
+        action={
+          <Link href="/login" className="btn-shimmer inline-flex items-center gap-2 text-white font-medium px-8 py-3.5 rounded-full text-[15px]">
+            Go to sign in <span aria-hidden>→</span>
+          </Link>
+        }
+      >
+        {accountType === "candidate"
+          ? <>We sent a verification link to <strong className="text-slate-900 font-medium">{email}</strong>. Click it to continue your setup.</>
+          : <>Your employer account is ready. You can now sign in.</>}
+      </AuthSuccess>
     )
   }
 
+  const tabs: { key: AccountType; label: string }[] = [
+    { key: "candidate", label: "I'm a candidate" },
+    { key: "employer", label: "I'm an employer" },
+  ]
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-lg">
-
-        {/* Back to site */}
-        <div className="mb-6">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Back to site
-          </Link>
-        </div>
-
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-extrabold text-gray-900">
-            Authentik<span className="text-blue-600">Me</span>
-          </Link>
-          <p className="text-gray-600 mt-2 text-sm">Create your account to get started</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-
-          {/* Account type tabs */}
-          <div className="flex border-b border-gray-200">
-            <button
-              type="button"
-              onClick={() => switchTab("candidate")}
-              className={`flex-1 py-4 text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
-                accountType === "candidate"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50/50"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              I&apos;m a Candidate
-            </button>
-            <button
-              type="button"
-              onClick={() => switchTab("employer")}
-              className={`flex-1 py-4 text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
-                accountType === "employer"
-                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50/50"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              I&apos;m an Employer
-            </button>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-5">
-
-            {/* First + Last name row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">First name</label>
-                <input
-                  type="text"
-                  required
-                  value={firstName}
-                  onChange={e => setFirstName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Jane"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Last name</label>
-                <input
-                  type="text"
-                  required
-                  value={lastName}
-                  onChange={e => setLastName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Smith"
-                />
-              </div>
-            </div>
-
-            {/* Company name — employer only */}
-            {accountType === "employer" && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Company name</label>
-                <input
-                  type="text"
-                  required
-                  value={company}
-                  onChange={e => setCompany(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Acme Corp"
-                />
-              </div>
-            )}
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                placeholder={accountType === "employer" ? "hr@company.com" : "you@example.com"}
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                placeholder="At least 8 characters"
-              />
-            </div>
-
-            {/* Confirm password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm password</label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                className={`w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition ${
-                  confirmPassword && confirmPassword !== password
-                    ? "border-red-300 focus:ring-red-400"
-                    : "border-gray-300 focus:ring-blue-500"
-                }`}
-                placeholder="Re-enter your password"
-              />
-              {confirmPassword && confirmPassword !== password && (
-                <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
-              )}
-            </div>
-
-            {/* Terms agreement */}
-            <div className="flex items-start gap-2.5">
-              <input
-                id="agreedToTerms"
-                type="checkbox"
-                checked={agreedToTerms}
-                onChange={e => setAgreedToTerms(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="agreedToTerms" className="text-sm text-gray-600">
-                I agree to the{" "}
-                <Link href="/terms" target="_blank" className="text-blue-600 hover:underline font-medium">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline font-medium">
-                  Privacy Policy
-                </Link>
-                {accountType === "candidate"
-                  ? ", including the recurring monthly billing terms, and I authorize AuthentikMe to charge my payment method automatically each month until I cancel."
-                  : "."}
-              </label>
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-shimmer text-white font-semibold py-3.5 rounded-xl transition disabled:opacity-60 text-sm"
-            >
-              {loading
-                ? "Creating account…"
-                : accountType === "candidate"
-                  ? "Create Candidate Account"
-                  : "Create Employer Account"}
-            </button>
-          </form>
-
-          <div className="px-5 sm:px-8 pb-6 sm:pb-8 text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline font-medium">
-              Sign in
-            </Link>
-          </div>
-        </div>
+    <AuthShell
+      panel={accountType}
+      title={accountType === "candidate"
+        ? <>Get <span className="gradient-text text-[1.08em]">verified.</span></>
+        : <>Register your <span className="gradient-text text-[1.08em]">company.</span></>}
+      subtitle={accountType === "candidate"
+        ? "Create your account and prove to employers you're the real deal."
+        : "Create an employer account to confirm candidate identities instantly."}
+    >
+      {/* Account type switch */}
+      <div className="grid grid-cols-2 p-1 mb-8 rounded-full bg-slate-900/[0.05] border border-slate-900/[0.06]" role="tablist">
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            type="button"
+            role="tab"
+            aria-selected={accountType === t.key}
+            onClick={() => switchTab(t.key)}
+            className={`py-2.5 rounded-full text-sm font-medium transition-all ${
+              accountType === t.key ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="su-first" className="auth-label">First name</label>
+            <input id="su-first" type="text" required autoComplete="given-name" value={firstName} onChange={e => setFirstName(e.target.value)} className="auth-input" placeholder="Jane" />
+          </div>
+          <div>
+            <label htmlFor="su-last" className="auth-label">Last name</label>
+            <input id="su-last" type="text" required autoComplete="family-name" value={lastName} onChange={e => setLastName(e.target.value)} className="auth-input" placeholder="Smith" />
+          </div>
+        </div>
+
+        {accountType === "employer" && (
+          <div>
+            <label htmlFor="su-company" className="auth-label">Company name</label>
+            <input id="su-company" type="text" required autoComplete="organization" value={company} onChange={e => setCompany(e.target.value)} className="auth-input" placeholder="Acme Corp" />
+          </div>
+        )}
+
+        <div>
+          <label htmlFor="su-email" className="auth-label">{accountType === "employer" ? "Work email" : "Email address"}</label>
+          <input id="su-email" type="email" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} className="auth-input" placeholder={accountType === "employer" ? "hr@company.com" : "you@example.com"} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="su-password" className="auth-label">Password</label>
+            <input id="su-password" type="password" required autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className="auth-input" placeholder="8+ characters" />
+          </div>
+          <div>
+            <label htmlFor="su-confirm" className="auth-label">Confirm password</label>
+            <input
+              id="su-confirm"
+              type="password"
+              required
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              className={`auth-input ${confirmPassword && confirmPassword !== password ? "is-invalid" : ""}`}
+              placeholder="Re-enter password"
+            />
+          </div>
+        </div>
+        {confirmPassword && confirmPassword !== password && (
+          <p className="text-rose-600 text-xs -mt-2">Passwords do not match</p>
+        )}
+
+        <div className="flex items-start gap-3">
+          <input id="agreedToTerms" type="checkbox" checked={agreedToTerms} onChange={e => setAgreedToTerms(e.target.checked)} className="auth-checkbox" />
+          <label htmlFor="agreedToTerms" className="text-[13px] text-slate-600 leading-relaxed">
+            I agree to the{" "}
+            <Link href="/terms" target="_blank" className="auth-link">Terms of Service</Link>{" "}
+            and{" "}
+            <Link href="/privacy" target="_blank" className="auth-link">Privacy Policy</Link>
+            {accountType === "candidate"
+              ? ", including the recurring monthly billing terms, and I authorize AuthentikMe to charge my payment method automatically each month until I cancel."
+              : "."}
+          </label>
+        </div>
+
+        {error && <div className="auth-error">{error}</div>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full btn-shimmer text-white font-medium py-4 rounded-full text-[15px] disabled:opacity-60 disabled:pointer-events-none"
+        >
+          {loading
+            ? "Creating account…"
+            : accountType === "candidate"
+              ? "Create candidate account"
+              : "Create employer account"}
+        </button>
+      </form>
+
+      <p className="mt-8 text-center text-sm text-slate-500">
+        Already have an account?{" "}
+        <Link href="/login" className="auth-link">Sign in</Link>
+      </p>
+    </AuthShell>
   )
 }

@@ -1,7 +1,8 @@
-﻿"use client"
+"use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import AuthShell from "../../components/AuthShell"
 
 export default function EmployerSignupPage() {
   const router = useRouter()
@@ -35,86 +36,47 @@ export default function EmployerSignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-blue-900">
-            Authentik<span className="text-blue-500">Me</span>
-          </Link>
-          <p className="text-gray-700 mt-2">Register your company account</p>
+    <AuthShell
+      panel="employer"
+      title={<>Register your <span className="gradient-text text-[1.08em]">company.</span></>}
+      subtitle="Create an employer account to confirm candidate identities instantly."
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="emp-name" className="auth-label">Your name</label>
+            <input id="emp-name" type="text" required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className="auth-input" placeholder="John Doe" />
+          </div>
+          <div>
+            <label htmlFor="emp-company" className="auth-label">Company name</label>
+            <input id="emp-company" type="text" required autoComplete="organization" value={company} onChange={(e) => setCompany(e.target.value)} className="auth-input" placeholder="Acme Corp" />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="emp-email" className="auth-label">Work email</label>
+          <input id="emp-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="auth-input" placeholder="hr@company.com" />
+        </div>
+        <div>
+          <label htmlFor="emp-password" className="auth-label">Password</label>
+          <input id="emp-password" type="password" required autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} className="auth-input" placeholder="At least 8 characters" />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Your name</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="John Doe"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company name</label>
-              <input
-                type="text"
-                required
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Acme Corp"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Work email</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="hr@company.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="At least 8 characters"
-              />
-            </div>
+        {error && <div className="auth-error">{error}</div>}
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-                {error}
-              </div>
-            )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full btn-shimmer text-white font-medium py-4 rounded-full text-[15px] disabled:opacity-60 disabled:pointer-events-none"
+        >
+          {loading ? "Creating account…" : "Create employer account"}
+        </button>
+      </form>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60"
-            >
-              {loading ? "Creating account…" : "Create Employer Account"}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-700">
-            Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline font-medium">
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+      <p className="mt-8 text-center text-sm text-slate-500">
+        Already have an account?{" "}
+        <Link href="/login" className="auth-link">Sign in</Link>
+      </p>
+    </AuthShell>
   )
 }
 
