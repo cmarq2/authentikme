@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import ReCAPTCHA from "react-google-recaptcha"
+import DashboardShell, { DashCard, DashHeading, DashLabel, IdentityCard, type DashNavItem } from "../../components/DashboardShell"
 
 type Status = {
   emailVerified: boolean
@@ -289,19 +290,26 @@ function DashboardInner() {
   const completedCount = steps.filter((s) => s.done).length
   const progressPct = Math.round((completedCount / steps.length) * 100)
 
-  const navItems: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  const navItems: DashNavItem<Tab>[] = [
     {
       id: "overview", label: "Overview",
       icon: (
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         </svg>
       ),
     },
     {
       id: "verification", label: "Verification",
+      badge: allDone ? (
+        <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      ) : (
+        <span className="text-[11px] font-semibold tabular-nums rounded-full px-2 py-0.5 bg-blue-500/20 text-blue-400">{completedCount}/{steps.length}</span>
+      ),
       icon: (
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
@@ -309,7 +317,7 @@ function DashboardInner() {
     {
       id: "settings", label: "Settings",
       icon: (
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
@@ -318,161 +326,87 @@ function DashboardInner() {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col">
-
-      {/* ── Header ── */}
-      <header className="bg-slate-900 border-b border-slate-800 px-6 py-4 shrink-0 z-20 relative">
-        <div className="flex items-center justify-between max-w-screen-xl mx-auto">
-          <Link href="/" className="text-xl font-bold text-white tracking-tight">
-            Authentik<span className="text-blue-400">Me</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500 hidden sm:block">{userStatus.email}</span>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold select-none ring-2 ring-blue-500/30">
-              {(userStatus.name ?? userStatus.email)[0].toUpperCase()}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-1 max-w-screen-xl mx-auto w-full">
-
-        {/* ── Sidebar (desktop) ── */}
-        <aside className="w-60 shrink-0 bg-slate-900 border-r border-slate-800 hidden md:flex flex-col py-6 px-3">
-          <div className="px-2 mb-2">
-            <p className="text-xs font-semibold text-slate-600 uppercase tracking-widest">Navigation</p>
-          </div>
-          <nav className="flex flex-col gap-1">
-            {navItems.map((item) => {
-              const isActive = activeTab === item.id
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-left ${
-                    isActive
-                      ? "text-blue-300 sidebar-item-active"
-                      : "text-slate-400 hover:text-white hover:bg-slate-800"
-                  }`}
-                >
-                  {item.icon}
-                  {item.label}
-                  {item.id === "verification" && !allDone && (
-                    <span className="ml-auto text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded-full">
-                      {completedCount}/{steps.length}
-                    </span>
-                  )}
-                  {item.id === "verification" && allDone && (
-                    <svg className="w-4 h-4 text-emerald-400 ml-auto shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button>
-              )
-            })}
-          </nav>
-
-          <div className="mt-auto pt-4 border-t border-slate-800">
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all w-full"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Sign out
-            </button>
-          </div>
-        </aside>
-
-        {/* ── Main content ── */}
-        <main
-          className="flex-1 overflow-y-auto px-4 sm:px-10 py-8 pb-24 md:pb-10"
-          style={{ background: "linear-gradient(135deg, #f8fafc 0%, #f0f4ff 50%, #f5f8ff 100%)" }}
-        >
-          {activeTab === "overview" && (
-            <OverviewTab
-              userStatus={userStatus}
-              steps={steps}
-              completedCount={completedCount}
-              progressPct={progressPct}
-              allDone={allDone}
-              copied={copied}
-              copyCode={copyCode}
-              onGoToVerification={() => setActiveTab("verification")}
-            />
-          )}
-          {activeTab === "verification" && (
-            <VerificationTab
-              userStatus={userStatus}
-              paymentResult={paymentResult}
-              paymentLoading={paymentLoading}
-              paymentError={paymentError}
-              captchaError={captchaError}
-              recaptchaRef={recaptchaRef}
-              totpStep={totpStep}
-              qrCode={qrCode}
-              totpToken={totpToken}
-              totpLoading={totpLoading}
-              totpError={totpError}
-              onPay={handlePay}
-              onCaptcha={handleCaptcha}
-              onStartTotp={startTotp}
-              onVerifyTotp={verifyTotp}
-              setTotpToken={setTotpToken}
-              setTotpStep={setTotpStep}
-              allDone={allDone}
-              copied={copied}
-              copyCode={copyCode}
-              discountCode={discountCode}
-              discountLoading={discountLoading}
-              discountError={discountError}
-              discountSuccess={discountSuccess}
-              setDiscountCode={setDiscountCode}
-              onApplyDiscount={handleDiscount}
-              resendLoading={resendLoading}
-              resendError={resendError}
-              resendCooldown={resendCooldown}
-              onResend={handleResend}
-              idPreview={idPreview}
-              idUploading={idUploading}
-              idError={idError}
-              idConfirming={idConfirming}
-              idConfirmBarActive={idConfirmBarActive}
-              onIdFileSelect={handleIdFileSelect}
-              idBackPreview={idBackPreview}
-              idBackUploading={idBackUploading}
-              idBackError={idBackError}
-              idBackConfirming={idBackConfirming}
-              idBackConfirmBarActive={idBackConfirmBarActive}
-              onIdBackFileSelect={handleIdBackFileSelect}
-            />
-          )}
-          {activeTab === "settings" && (
-            <SettingsTab userStatus={userStatus} onStatusChange={fetchStatus} />
-          )}
-        </main>
-      </div>
-
-      {/* ── Mobile bottom nav ── */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 flex z-10">
-        {navItems.map((item) => {
-          const isActive = activeTab === item.id
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors ${
-                isActive ? "text-blue-400" : "text-slate-500"
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </button>
-          )
-        })}
-      </div>
-    </div>
+    <DashboardShell
+      navItems={navItems}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      user={{ name: userStatus.name ?? "", email: userStatus.email, role: "Candidate account" }}
+      status={
+        allDone ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-[12px] font-semibold text-emerald-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Verified
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-900/10 px-3 py-1.5 text-[12px] font-medium text-slate-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            {completedCount}/{steps.length}<span className="hidden sm:inline"> steps complete</span>
+          </span>
+        )
+      }
+    >
+      {activeTab === "overview" && (
+        <OverviewTab
+          userStatus={userStatus}
+          steps={steps}
+          completedCount={completedCount}
+          progressPct={progressPct}
+          allDone={allDone}
+          copied={copied}
+          copyCode={copyCode}
+          onGoToVerification={() => setActiveTab("verification")}
+        />
+      )}
+      {activeTab === "verification" && (
+        <VerificationTab
+          userStatus={userStatus}
+          paymentResult={paymentResult}
+          paymentLoading={paymentLoading}
+          paymentError={paymentError}
+          captchaError={captchaError}
+          recaptchaRef={recaptchaRef}
+          totpStep={totpStep}
+          qrCode={qrCode}
+          totpToken={totpToken}
+          totpLoading={totpLoading}
+          totpError={totpError}
+          onPay={handlePay}
+          onCaptcha={handleCaptcha}
+          onStartTotp={startTotp}
+          onVerifyTotp={verifyTotp}
+          setTotpToken={setTotpToken}
+          setTotpStep={setTotpStep}
+          allDone={allDone}
+          copied={copied}
+          copyCode={copyCode}
+          discountCode={discountCode}
+          discountLoading={discountLoading}
+          discountError={discountError}
+          discountSuccess={discountSuccess}
+          setDiscountCode={setDiscountCode}
+          onApplyDiscount={handleDiscount}
+          resendLoading={resendLoading}
+          resendError={resendError}
+          resendCooldown={resendCooldown}
+          onResend={handleResend}
+          idPreview={idPreview}
+          idUploading={idUploading}
+          idError={idError}
+          idConfirming={idConfirming}
+          idConfirmBarActive={idConfirmBarActive}
+          onIdFileSelect={handleIdFileSelect}
+          idBackPreview={idBackPreview}
+          idBackUploading={idBackUploading}
+          idBackError={idBackError}
+          idBackConfirming={idBackConfirming}
+          idBackConfirmBarActive={idBackConfirmBarActive}
+          onIdBackFileSelect={handleIdBackFileSelect}
+        />
+      )}
+      {activeTab === "settings" && (
+        <SettingsTab userStatus={userStatus} onStatusChange={fetchStatus} />
+      )}
+    </DashboardShell>
   )
 }
 
@@ -529,38 +463,69 @@ function OverviewTab({
     ),
   }
 
+  const remaining = steps.length - completedCount
+
   return (
-    <div className="max-w-2xl">
+    <div>
+      <DashHeading
+        title={<>Welcome back, <span className="gradient-text text-[1.08em]">{firstName}.</span></>}
+        subtitle={allDone
+          ? "Your identity is verified. Share your code with employers to stand out from day one."
+          : "Here's where your identity verification stands."}
+      />
 
-      {/* Welcome */}
-      <div className="mb-8 dash-enter">
-        <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-3xl font-bold text-slate-900">Welcome back, {firstName}</h1>
-          {allDone && (
-            <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Fully Verified
-            </span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Identity card */}
+        <div className="lg:col-span-7 space-y-4 dash-enter dash-delay-1">
+          {allDone && userStatus.verificationCode ? (
+            <IdentityCard
+              holder={userStatus.name ?? userStatus.email}
+              code={userStatus.verificationCode}
+              footer={
+                <button
+                  onClick={copyCode}
+                  className={`shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-all ${
+                    copied ? "bg-emerald-400 text-slate-950" : "bg-white text-slate-900 hover:bg-blue-50"
+                  }`}
+                >
+                  {copied ? (
+                    <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> Copied</>
+                  ) : (
+                    <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> Copy code</>
+                  )}
+                </button>
+              }
+            />
+          ) : (
+            <IdentityCard
+              holder={userStatus.name ?? userStatus.email}
+              code={null}
+              locked
+              footer={
+                <button
+                  onClick={onGoToVerification}
+                  className="shrink-0 inline-flex items-center gap-2 rounded-full bg-white text-slate-900 hover:bg-blue-50 px-4 py-2.5 text-[13px] font-semibold transition-colors"
+                >
+                  Unlock code
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              }
+            />
           )}
+          <p className="text-[13px] text-slate-500 px-1">
+            {allDone
+              ? "Share this code with any employer — they can confirm your identity instantly."
+              : `${remaining} step${remaining !== 1 ? "s" : ""} left to unlock your verification code.`}
+          </p>
         </div>
-        <p className="text-slate-500 text-sm">Here&apos;s your identity verification overview.</p>
-      </div>
 
-      {/* Verification status card */}
-      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 mb-5 dash-enter dash-delay-1 card-hover" style={{ transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease" }}>
-        {/* Accent bar */}
-        <div className="h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
-        <div className="p-6">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Verification Status</p>
-          <div className="flex items-center gap-8 mb-6">
-            {/* Animated ring */}
-            <div className={`relative shrink-0 ${allDone ? "ring-glow-green" : "ring-glow-blue"}`}>
-              <svg viewBox="0 0 100 100" className="w-28 h-28">
-                {/* Track */}
+        {/* Progress */}
+        <DashCard className="lg:col-span-5 p-6 dash-enter dash-delay-2">
+          <DashLabel className="mb-5">Verification progress</DashLabel>
+          <div className="flex items-center gap-5 mb-6">
+            <div className="relative shrink-0">
+              <svg viewBox="0 0 100 100" className="w-24 h-24">
                 <circle cx="50" cy="50" r={r} fill="none" stroke="#f1f5f9" strokeWidth="7" />
-                {/* Progress */}
                 <circle
                   cx="50" cy="50" r={r} fill="none"
                   stroke={allDone ? "url(#greenGrad)" : "url(#blueGrad)"}
@@ -573,7 +538,7 @@ function OverviewTab({
                 />
                 <defs>
                   <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="0%" stopColor="#2563eb" />
                     <stop offset="100%" stopColor="#6366f1" />
                   </linearGradient>
                   <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -582,140 +547,66 @@ function OverviewTab({
                   </linearGradient>
                 </defs>
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`text-2xl font-bold tabular-nums ${allDone ? "text-emerald-600" : "text-blue-600"}`}>
-                  {ringPct}%
-                </span>
-                <span className="text-xs text-slate-400 font-medium">{completedCount}/{steps.length}</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-semibold tabular-nums tracking-tight text-slate-900">{ringPct}%</span>
               </div>
             </div>
-
-            <div className="flex-1">
-              <p className="text-lg font-bold text-slate-900 mb-1">
-                {allDone ? "Identity Verified" : `${steps.length - completedCount} step${steps.length - completedCount !== 1 ? "s" : ""} remaining`}
+            <div>
+              <p className="text-lg font-semibold tracking-tight text-slate-900">
+                {allDone ? "Identity verified" : `${remaining} step${remaining !== 1 ? "s" : ""} remaining`}
               </p>
-              <p className="text-sm text-slate-500 leading-relaxed">
-                {allDone
-                  ? "All checks passed. Your verification code is ready to share with employers."
-                  : "Complete the remaining steps to unlock your unique verification code."}
+              <p className="text-[13px] text-slate-500 leading-relaxed mt-0.5">
+                {allDone ? "All checks passed." : `${completedCount} of ${steps.length} checks complete`}
               </p>
-              {!allDone && (
-                <button
-                  onClick={onGoToVerification}
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors group"
-                >
-                  Continue verification
-                  <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              )}
             </div>
           </div>
 
-          {/* Step pills */}
-          <div className="grid grid-cols-2 gap-2">
+          <ul className="space-y-1">
             {steps.map((s) => (
-              <div
-                key={s.key}
-                className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
-                  s.done
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                    : "bg-slate-50 text-slate-400 border-slate-100"
-                }`}
-              >
-                <div className={`shrink-0 ${s.done ? "text-emerald-500" : "text-slate-300"}`}>
+              <li key={s.key} className="flex items-center gap-3 py-2">
+                <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                  s.done ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-400"
+                }`}>
                   {s.done ? (
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   ) : stepIcons[s.key]}
+                </span>
+                <span className={`text-[14px] ${s.done ? "text-slate-900 font-medium" : "text-slate-500"}`}>{s.label}</span>
+                <span className={`ml-auto text-[11px] font-semibold ${s.done ? "text-emerald-600" : "text-slate-400"}`}>{s.done ? "Done" : "Pending"}</span>
+              </li>
+            ))}
+          </ul>
+
+          {!allDone && (
+            <button
+              onClick={onGoToVerification}
+              className="mt-5 w-full btn-shimmer text-white font-medium py-3 rounded-full text-[14px] inline-flex items-center justify-center gap-2"
+            >
+              Continue verification <span aria-hidden>→</span>
+            </button>
+          )}
+        </DashCard>
+
+        {/* How to use your code */}
+        <DashCard className="lg:col-span-12 p-6 sm:p-7 dash-enter dash-delay-3">
+          <DashLabel className="mb-5">How to use your code</DashLabel>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              { n: "01", t: "Add it to applications", d: "Paste your code into job applications, your CV, or your email signature." },
+              { n: "02", t: "Employers enter it", d: "Hiring teams enter your code in their AuthentikMe employer dashboard." },
+              { n: "03", t: "Instant confirmation", d: "They see in real time that your identity has been verified." },
+            ].map(x => (
+              <div key={x.n} className="flex gap-4">
+                <span className="font-serif italic text-2xl text-blue-600/70 leading-none pt-0.5 w-7 shrink-0">{x.n}</span>
+                <div>
+                  <p className="text-[15px] font-semibold tracking-tight text-slate-900 mb-1">{x.t}</p>
+                  <p className="text-[13px] text-slate-500 leading-relaxed">{x.d}</p>
                 </div>
-                {s.label}
               </div>
             ))}
           </div>
-        </div>
+        </DashCard>
       </div>
-
-      {/* Verification code */}
-      {allDone && userStatus.verificationCode ? (
-        <div className="shimmer-sweep code-card-glow rounded-2xl overflow-hidden dash-enter dash-delay-2"
-          style={{ background: "linear-gradient(135deg, #1d4ed8 0%, #4338ca 50%, #6d28d9 100%)" }}>
-          <div className="p-6">
-            {/* Header */}
-            <div className="flex items-center gap-2.5 mb-1">
-              <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                </svg>
-              </div>
-              <span className="text-white font-semibold text-sm">Your Verification Code</span>
-            </div>
-            <p className="text-blue-200/80 text-xs mb-5 ml-9">Share this with any employer to prove your identity is verified.</p>
-
-            {/* Code display */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 border border-white/10">
-              <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-2">Identity Code</p>
-              <span className="text-3xl font-mono font-bold tracking-[0.3em] text-white">
-                {userStatus.verificationCode}
-              </span>
-            </div>
-
-            <button
-              onClick={copyCode}
-              className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all ${
-                copied
-                  ? "bg-emerald-400 text-white"
-                  : "bg-white text-indigo-700 hover:bg-blue-50"
-              }`}
-              style={{ transition: "background 0.2s ease, transform 0.15s ease" }}
-            >
-              {copied ? (
-                <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> Copied to clipboard</>
-              ) : (
-                <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> Copy Code</>
-              )}
-            </button>
-          </div>
-        </div>
-      ) : !allDone ? (
-        <div className="relative bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm dash-enter dash-delay-2 group">
-          {/* Blurred preview */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden>
-            <span className="text-5xl font-mono font-bold tracking-[0.35em] text-slate-100 blur-sm">
-              XXXX-XXXX
-            </span>
-          </div>
-
-          {/* Overlay content */}
-          <div className="relative p-8 flex flex-col items-center text-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-300">
-              <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <p className="text-base font-bold text-slate-800 mb-1">Verification code locked</p>
-            <p className="text-sm text-slate-500 mb-1">
-              {steps.length - completedCount} step{steps.length - completedCount !== 1 ? "s" : ""} remaining to unlock your code
-            </p>
-            <div className="flex gap-1 mb-5 mt-1">
-              {steps.map((s) => (
-                <div key={s.key} className={`h-1 w-8 rounded-full transition-colors ${s.done ? "bg-blue-500" : "bg-slate-200"}`} />
-              ))}
-            </div>
-            <button
-              onClick={onGoToVerification}
-              className="btn-shimmer inline-flex items-center gap-2 text-white text-sm font-semibold px-6 py-2.5 rounded-xl"
-            >
-              Continue Verification
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      ) : null}
     </div>
   )
 }
@@ -776,11 +667,11 @@ function VerificationTab({
   onIdBackFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8 dash-enter">
-        <h1 className="text-3xl font-bold text-slate-900">Verification Steps</h1>
-        <p className="text-slate-500 text-sm mt-1">Complete each step to earn your AuthentikMe verification code.</p>
-      </div>
+    <div className="max-w-3xl">
+      <DashHeading
+        title={<>Verification <span className="gradient-text text-[1.08em]">steps.</span></>}
+        subtitle="Complete each step to earn your AuthentikMe verification code."
+      />
 
       {/* Banners */}
       {paymentResult === "success" && !userStatus.stripePaid && (
@@ -797,32 +688,21 @@ function VerificationTab({
 
       {/* Code card when done */}
       {allDone && userStatus.verificationCode && (
-        <div className="shimmer-sweep code-card-glow rounded-2xl overflow-hidden mb-6 dash-enter"
-          style={{ background: "linear-gradient(135deg, #1d4ed8 0%, #4338ca 50%, #6d28d9 100%)" }}>
-          <div className="p-6">
-            <div className="flex items-center gap-2.5 mb-1">
-              <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <span className="text-white font-semibold text-sm">Identity Fully Verified</span>
-            </div>
-            <p className="text-blue-200/80 text-xs mb-4 ml-9">Share this code with any employer to prove your identity.</p>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 bg-white/10 backdrop-blur rounded-xl px-5 py-3 border border-white/10">
-                <span className="text-2xl font-mono font-bold tracking-widest text-white">{userStatus.verificationCode}</span>
-              </div>
+        <div className="mb-6 dash-enter">
+          <IdentityCard
+            holder={userStatus.name ?? userStatus.email}
+            code={userStatus.verificationCode}
+            footer={
               <button
                 onClick={copyCode}
-                className={`px-4 py-3 rounded-xl font-semibold text-sm transition-all ${
-                  copied ? "bg-emerald-400 text-white" : "bg-white text-indigo-700 hover:bg-blue-50"
+                className={`shrink-0 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-all ${
+                  copied ? "bg-emerald-400 text-slate-950" : "bg-white text-slate-900 hover:bg-blue-50"
                 }`}
               >
-                {copied ? "Copied!" : "Copy"}
+                {copied ? "Copied!" : "Copy code"}
               </button>
-            </div>
-          </div>
+            }
+          />
         </div>
       )}
 
@@ -840,7 +720,7 @@ function VerificationTab({
               <button
                 onClick={onResend}
                 disabled={resendLoading || resendCooldown > 0}
-                className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-6 rounded-xl disabled:opacity-60 text-sm transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 px-6 rounded-full disabled:opacity-60 text-[14px] transition-colors"
               >
                 {resendLoading ? (
                   <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Sending…</>
@@ -875,7 +755,7 @@ function VerificationTab({
               <button
                 onClick={onPay}
                 disabled={paymentLoading}
-                className="w-full flex items-center justify-center gap-2 btn-shimmer text-white font-semibold py-3 px-6 rounded-xl disabled:opacity-60 text-sm"
+                className="w-full flex items-center justify-center gap-2 btn-shimmer text-white font-medium py-3.5 px-6 rounded-full disabled:opacity-60 text-[14px]"
               >
                 {paymentLoading ? (
                   <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Redirecting to payment…</>
@@ -971,7 +851,7 @@ function VerificationTab({
                     ) : (
                       <>
                         <label
-                          className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
+                          className={`w-full flex items-center justify-center gap-2 font-medium py-3.5 rounded-full text-[14px] transition-colors ${
                             idUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "btn-shimmer text-white cursor-pointer"
                           }`}
                         >
@@ -1049,7 +929,7 @@ function VerificationTab({
                     ) : (
                       <>
                         <label
-                          className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm transition-colors ${
+                          className={`w-full flex items-center justify-center gap-2 font-medium py-3.5 rounded-full text-[14px] transition-colors ${
                             idBackUploading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
                           }`}
                         >
@@ -1097,7 +977,7 @@ function VerificationTab({
           {!userStatus.totpEnabled && userStatus.idUploaded && (
             <div>
               {totpStep === "idle" && (
-                <button onClick={onStartTotp} className="w-full btn-shimmer text-white font-semibold py-3 rounded-xl text-sm">
+                <button onClick={onStartTotp} className="w-full btn-shimmer text-white font-medium py-3.5 rounded-full text-[14px]">
                   Generate QR Code
                 </button>
               )}
@@ -1109,7 +989,7 @@ function VerificationTab({
                       <div className="inline-block p-3 bg-white border border-slate-200 rounded-2xl shadow-sm mb-4">
                         <img src={qrCode} alt="TOTP QR Code" width={160} />
                       </div>
-                      <button onClick={() => setTotpStep("verify")} className="w-full btn-shimmer text-white font-semibold py-3 rounded-xl text-sm">
+                      <button onClick={() => setTotpStep("verify")} className="w-full btn-shimmer text-white font-medium py-3.5 rounded-full text-[14px]">
                         I&apos;ve scanned it — Enter Code
                       </button>
                     </>
@@ -1135,7 +1015,7 @@ function VerificationTab({
                   {totpError && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">{totpError}</div>}
                   <button
                     type="submit" disabled={totpLoading || totpToken.length !== 6}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 text-sm"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3.5 rounded-full transition-colors disabled:opacity-50 text-[14px]"
                   >
                     {totpLoading ? "Verifying…" : "Verify & Complete Setup"}
                   </button>
@@ -1175,23 +1055,23 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
   }
 
   return (
-    <div className="max-w-lg">
-      <div className="mb-8 dash-enter">
-        <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-        <p className="text-slate-500 text-sm mt-1">Manage your account and security preferences.</p>
-      </div>
+    <div className="max-w-2xl">
+      <DashHeading
+        title={<>Account <span className="gradient-text text-[1.08em]">settings.</span></>}
+        subtitle="Manage your profile, security, and subscription."
+      />
 
       {/* Profile */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm mb-4 overflow-hidden dash-enter dash-delay-1">
+      <div className="bg-white rounded-[22px] border border-slate-900/[0.06] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-16px_rgba(15,23,42,0.12)] mb-4 overflow-hidden dash-enter dash-delay-1">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
           <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
-          <h2 className="text-sm font-semibold text-slate-700">Profile</h2>
+          <h2 className="text-[14px] font-semibold tracking-tight text-slate-900">Profile</h2>
         </div>
 
         <div className="px-6 py-5 border-b border-slate-50 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold ring-4 ring-blue-100 select-none">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center text-white text-xl font-semibold select-none">
             {(userStatus.name ?? userStatus.email)[0].toUpperCase()}
           </div>
           <div>
@@ -1223,12 +1103,12 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
       </div>
 
       {/* Security */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm mb-4 overflow-hidden dash-enter dash-delay-2">
+      <div className="bg-white rounded-[22px] border border-slate-900/[0.06] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-16px_rgba(15,23,42,0.12)] mb-4 overflow-hidden dash-enter dash-delay-2">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
           <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
-          <h2 className="text-sm font-semibold text-slate-700">Security</h2>
+          <h2 className="text-[14px] font-semibold tracking-tight text-slate-900">Security</h2>
         </div>
         <div className="divide-y divide-slate-50">
           <div className="px-6 py-4 flex items-center justify-between">
@@ -1263,12 +1143,12 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
 
       {/* Subscription management */}
       {userStatus.stripePaid && (
-        <div className="bg-white rounded-2xl border border-red-100 shadow-sm mb-4 overflow-hidden dash-enter dash-delay-3">
+        <div className="bg-white rounded-[22px] border border-rose-200/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)] mb-4 overflow-hidden dash-enter dash-delay-3">
           <div className="px-6 py-4 border-b border-red-50 flex items-center gap-2">
             <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
-            <h2 className="text-sm font-semibold text-slate-700">Subscription</h2>
+            <h2 className="text-[14px] font-semibold tracking-tight text-slate-900">Subscription</h2>
           </div>
           <div className="px-6 py-5">
             {!cancelConfirm ? (
@@ -1313,12 +1193,12 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
       )}
 
       {/* Account */}
-      <div className={`bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden dash-enter ${userStatus.stripePaid ? "dash-delay-4" : "dash-delay-3"}`}>
+      <div className={`bg-white rounded-[22px] border border-slate-900/[0.06] shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-16px_rgba(15,23,42,0.12)] overflow-hidden dash-enter ${userStatus.stripePaid ? "dash-delay-4" : "dash-delay-3"}`}>
         <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
           <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-sm font-semibold text-slate-700">Account</h2>
+          <h2 className="text-[14px] font-semibold tracking-tight text-slate-900">Account</h2>
         </div>
         <div className="px-6 py-4">
           <button
@@ -1352,51 +1232,58 @@ function PremiumStepCard({
 }) {
   return (
     <div
-      className={`bg-white rounded-2xl border overflow-hidden transition-all duration-300 dash-enter ${delay} ${
-        done ? "border-emerald-200 step-card-done" : locked ? "border-slate-100 opacity-50" : "border-slate-200 step-card-active"
+      className={`rounded-[22px] border transition-all duration-300 dash-enter ${delay} ${
+        done
+          ? "bg-white border-emerald-500/20 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+          : locked
+          ? "bg-white/50 border-slate-900/[0.05]"
+          : "bg-white border-blue-500/25 shadow-[0_0_0_4px_rgba(59,130,246,0.06),0_16px_40px_-20px_rgba(15,23,42,0.25)]"
       }`}
     >
-      {/* Top accent line */}
-      {!locked && (
-        <div className={`h-0.5 ${done ? "bg-gradient-to-r from-emerald-400 to-green-500" : "bg-gradient-to-r from-blue-500 to-indigo-500"}`} />
-      )}
-      <div className="p-5">
+      <div className="p-5 sm:p-6">
         <div className="flex items-start gap-4">
           {/* Step indicator */}
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm ${
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-[15px] font-semibold ${
             done
               ? "bg-emerald-500 text-white"
               : locked
               ? "bg-slate-100 text-slate-300"
-              : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-200"
+              : "bg-slate-900 text-white shadow-[0_8px_20px_-8px_rgba(15,23,42,0.6)]"
           }`}>
             {done ? (
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
+            ) : locked ? (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
             ) : number}
           </div>
 
           <div className="flex-1 min-w-0 pt-0.5">
-            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-              <h3 className={`font-semibold text-sm ${done ? "text-emerald-800" : locked ? "text-slate-400" : "text-slate-900"}`}>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className={`font-semibold text-[15px] tracking-tight ${locked ? "text-slate-400" : "text-slate-900"}`}>
                 {title}
               </h3>
               {done && (
-                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">Complete</span>
+                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">Complete</span>
+              )}
+              {!done && !locked && (
+                <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">Up next</span>
               )}
               {locked && !done && (
-                <span className="text-xs font-medium text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">Locked</span>
+                <span className="text-[11px] font-medium text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">Locked</span>
               )}
             </div>
-            <p className={`text-sm leading-relaxed ${locked ? "text-slate-300" : done ? "text-emerald-700/70" : "text-slate-500"}`}>
+            <p className={`text-[14px] leading-relaxed ${locked ? "text-slate-400/80" : "text-slate-500"}`}>
               {description}
             </p>
           </div>
         </div>
 
         {!locked && children && (!done || forceShowChildren) && (
-          <div className="mt-4 ml-13">{children}</div>
+          <div className="mt-5 sm:ml-14">{children}</div>
         )}
       </div>
     </div>
