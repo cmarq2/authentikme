@@ -187,11 +187,12 @@ export default function Home() {
             <ScrollReveal direction="left" className="relative">
               <div className="photo-frame rounded-[28px] aspect-[4/5] sm:aspect-[5/6] bg-slate-200">
                 <Image
-                  src="/images/interview.jpg"
-                  alt="A candidate in an interview with a hiring manager"
+                  src="/images/verified-professionals.jpg"
+                  alt="Two confident professionals in blazers standing in a modern office"
                   fill
+                  quality={90}
                   sizes="(min-width: 1024px) 540px, 92vw"
-                  className="object-cover object-[35%_50%]"
+                  className="object-cover object-center"
                 />
               </div>
               {/* Stat card */}
