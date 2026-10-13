@@ -3,9 +3,9 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 
 const navLinks = [
-  { href: "#why", label: "Why It Matters" },
-  { href: "#process", label: "Process" },
-  { href: "#compare", label: "Compare" },
+  { href: "/#why", label: "Why It Matters" },
+  { href: "/#process", label: "Process" },
+  { href: "/#compare", label: "Compare" },
 ]
 
 export function LogoMark({ className = "w-7 h-7" }: { className?: string }) {
@@ -19,7 +19,7 @@ export function LogoMark({ className = "w-7 h-7" }: { className?: string }) {
   )
 }
 
-export default function HeaderNav() {
+export default function HeaderNav({ overDark = false }: { overDark?: boolean }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -30,6 +30,9 @@ export default function HeaderNav() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  // Light text while the header floats transparently over a dark hero image
+  const light = overDark && !scrolled && !open
+
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
@@ -39,30 +42,30 @@ export default function HeaderNav() {
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
-        <a href="#" className="flex items-center gap-2.5 font-semibold text-[19px] tracking-tight text-slate-900 hover:opacity-80 transition-opacity">
+        <Link href="/" className={`flex items-center gap-2.5 font-semibold text-[19px] tracking-tight ${light ? "text-white" : "text-slate-900"} hover:opacity-80 transition-opacity`}>
           <LogoMark />
-          <span>Authentik<span className="text-blue-600">Me</span></span>
-        </a>
+          <span>Authentik<span className={light ? "text-blue-300" : "text-blue-600"}>Me</span></span>
+        </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-9 text-[14px] text-slate-600">
+        <nav className={`hidden md:flex items-center gap-9 text-[14px] transition-colors ${light ? "text-white/75 [&_a:hover]:text-white" : "text-slate-600 [&_a:hover]:text-slate-900"}`}>
           {navLinks.map(l => (
-            <a key={l.href} href={l.href} className="hover:text-slate-900 transition-colors">{l.label}</a>
+            <a key={l.href} href={l.href} className="transition-colors">{l.label}</a>
           ))}
-          <Link href="/contact" className="hover:text-slate-900 transition-colors">Contact</Link>
+          <Link href="/contact" className="transition-colors">Contact</Link>
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Link href="/login" className="text-[14px] font-medium text-slate-700 hover:text-slate-900 transition-colors hidden sm:block px-3 py-2">
+          <Link href="/login" className={`text-[14px] font-medium transition-colors hidden sm:block px-3 py-2 ${light ? "text-white/85 hover:text-white" : "text-slate-700 hover:text-slate-900"}`}>
             Sign in
           </Link>
-          <Link href="/candidate/signup" className="bg-slate-900 text-white text-[14px] font-medium px-4 sm:px-5 py-2.5 rounded-full hover:bg-slate-800 transition-colors shadow-sm">
+          <Link href="/candidate/signup" className={`text-[14px] font-medium px-4 sm:px-5 py-2.5 rounded-full transition-colors shadow-sm ${light ? "bg-white text-slate-900 hover:bg-slate-100" : "bg-slate-900 text-white hover:bg-slate-800"}`}>
             Get Verified
           </Link>
           {/* Hamburger — mobile only */}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className={`md:hidden p-2 rounded-lg transition-colors ${light ? "text-white hover:bg-white/10" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"}`}
             aria-label="Toggle menu"
           >
             {open ? (
