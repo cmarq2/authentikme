@@ -50,7 +50,7 @@ export default function HeroVisual() {
               <span className="absolute inset-0 rounded-full bg-emerald-400" />
             </div>
             <div>
-              <p className="text-white text-[13px] font-semibold leading-tight">Human Verified</p>
+              <p className="text-white text-[13px] font-semibold leading-tight">Identity Verified</p>
               <p className="text-slate-400 text-[11px]">Code ready to share with employers</p>
             </div>
           </div>

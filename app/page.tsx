@@ -26,12 +26,12 @@ const hesitateReasons = [
 const processSteps = [
   { num: "01", title: "Register Your Identity", desc: "Create your account using your real credentials. Your information is encrypted and never shared with employers without your consent." },
   { num: "02", title: "Complete Human Verification", desc: "Set up Google Authenticator to confirm you are a live, real person. The same two-factor standard used by banks and global enterprises — applied to your job search." },
-  { num: "03", title: "Earn Employer Confidence", desc: "Your verified status is visible to potential employers. They know instantly you are not a bot, not AI, not spam — just a real candidate they can trust and engage with directly." },
+  { num: "03", title: "Earn Employer Confidence", desc: "Your verified status is visible to potential employers. They know instantly you are a verified professional — a real, accountable candidate they can trust and engage with directly." },
 ]
 
 const tickerItems = [
-  "100% Human Verified",
-  "Zero Bots Approved",
+  "100% Identity Verified",
+  "Verified Professionals & Contractors",
   "3× More Callbacks",
   "Verified in Minutes",
   "Bank-Grade Security",
@@ -146,8 +146,8 @@ export default function Home() {
                     </svg>
                   </div>
                   <div className="leading-tight">
-                    <p className="text-slate-900 text-[13px] font-semibold">100% Human</p>
-                    <p className="text-slate-500 text-[11px]">Not a bot</p>
+                    <p className="text-slate-900 text-[13px] font-semibold">100% Verified</p>
+                    <p className="text-slate-500 text-[11px]">Identity confirmed</p>
                   </div>
                 </div>
 
@@ -210,8 +210,8 @@ export default function Home() {
               <ScrollReveal direction="right">
                 <p className="eyebrow text-blue-700 mb-6">Why It Matters</p>
                 <h2 className={`text-4xl sm:text-5xl ${headingCls} text-slate-900 mb-6`}>
-                  Verified human.<br />
-                  <span className="gradient-text text-[1.08em]">Not a bot.</span>
+                  Verified professionals.<br />
+                  <span className="gradient-text text-[1.08em]">Trusted from day one.</span>
                 </h2>
                 <p className="text-slate-600 text-lg leading-relaxed mb-10">
                   Employers are flooded with AI-generated applications and spam accounts. AuthentikMe proves you are neither — giving you an immediate, measurable edge over every unverified applicant.
@@ -377,8 +377,8 @@ export default function Home() {
           <ScrollReveal>
             <div className="grid grid-cols-1 sm:grid-cols-3 rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03]">
               {[
-                { value: "100%", label: "Human-Verified Candidates" },
-                { value: "0",    label: "Bots or AI Accounts Passed" },
+                { value: "100%", label: "Identity-Verified Professionals" },
+                { value: "<3 min", label: "Average Time to Get Verified" },
                 { value: "3×",   label: "Higher Employer Callback Rate" },
               ].map((item, i) => (
                 <div
@@ -415,7 +415,7 @@ export default function Home() {
               Ready to be <span className="gradient-text-light text-[1.08em]">verified?</span>
             </h2>
             <p className="text-slate-300 text-lg mb-10 leading-relaxed">
-              Join candidates who have already proven their humanity to employers — and left the bots behind.
+              Join the professionals and contractors who have verified their identity — and give every employer a reason to trust you first.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/candidate/signup" className="btn-shimmer text-white font-medium px-9 py-4 rounded-full text-[15px] inline-flex items-center justify-center gap-2">
