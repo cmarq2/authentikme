@@ -39,6 +39,7 @@ const panels: Record<AuthPanel, { image: string; alt: string; eyebrow: string; t
       "Filter out AI-generated and fraudulent applicants",
       "A tamper-proof identity record for every verified hire",
       "Instant, real-time confirmation from your dashboard",
+      "$199.99 a month — billed monthly",
     ],
   },
 }

@@ -63,7 +63,7 @@ export default function EmployerSignupPage() {
     <AuthShell
       panel="employer"
       title={<>Register your <span className="gradient-text text-[1.08em]">company.</span></>}
-      subtitle="Create an employer account to confirm candidate identities instantly."
+      subtitle={<>Create an employer account to confirm candidate identities instantly. Recruiter plan: <strong className="text-slate-900 font-semibold">$199.99/month</strong> · <Link href="/pricing" className="auth-link">See pricing</Link></>}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -92,7 +92,7 @@ export default function EmployerSignupPage() {
             <Link href="/terms" target="_blank" className="auth-link">Terms of Service</Link>{" "}
             and{" "}
             <Link href="/privacy" target="_blank" className="auth-link">Privacy Policy</Link>
-            .
+            , including the $199.99 per month recruiter plan.
           </label>
         </div>
 

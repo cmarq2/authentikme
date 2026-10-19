@@ -6,6 +6,7 @@ const navLinks = [
   { href: "/#why", label: "Why It Matters" },
   { href: "/#process", label: "Process" },
   { href: "/#compare", label: "Compare" },
+  { href: "/pricing", label: "Pricing" },
 ]
 
 export function LogoMark({ className = "w-7 h-7" }: { className?: string }) {

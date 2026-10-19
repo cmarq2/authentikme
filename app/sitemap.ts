@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next"
 const siteUrl = "https://www.authentikme.com"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/login", "/candidate/signup", "/employer/signup"]
+  const routes = ["", "/pricing", "/login", "/candidate/signup", "/employer/signup"]
 
   return routes.map((route) => ({
     url: `${siteUrl}${route}`,

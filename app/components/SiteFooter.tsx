@@ -20,6 +20,7 @@ export default function SiteFooter() {
               <p className="text-slate-300 font-medium mb-4">Candidates</p>
               <ul className="space-y-3 text-slate-500">
                 <li><Link href="/candidate/signup" className="hover:text-slate-300 transition-colors">Get verified</Link></li>
+                <li><Link href="/pricing" className="hover:text-slate-300 transition-colors">Pricing — $19.99</Link></li>
                 <li><Link href="/login" className="hover:text-slate-300 transition-colors">Sign in</Link></li>
               </ul>
             </div>
@@ -27,6 +28,7 @@ export default function SiteFooter() {
               <p className="text-slate-300 font-medium mb-4">Employers</p>
               <ul className="space-y-3 text-slate-500">
                 <li><Link href="/employer/signup" className="hover:text-slate-300 transition-colors">Create account</Link></li>
+                <li><Link href="/pricing" className="hover:text-slate-300 transition-colors">Pricing — $199.99/mo</Link></li>
                 <li><Link href="/contact" className="hover:text-slate-300 transition-colors">Contact</Link></li>
               </ul>
             </div>

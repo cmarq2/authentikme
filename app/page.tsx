@@ -402,6 +402,48 @@ export default function Home() {
       {/* ── Comparison ── */}
       <ComparisonSection />
 
+      {/* ── Pricing preview ── */}
+      <section id="pricing" className="py-20 sm:py-28 px-4 sm:px-6 bg-[#F8F7F4] border-t border-slate-900/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <ScrollReveal className="text-center mb-12 sm:mb-14">
+            <p className="eyebrow text-blue-700 mb-6">Pricing</p>
+            <h2 className={`text-4xl sm:text-5xl ${headingCls} text-slate-900`}>
+              Simple pricing. <span className="gradient-text text-[1.08em]">Real trust.</span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <ScrollReveal delay={0}>
+              <div className="h-full rounded-[24px] bg-white border border-slate-900/[0.08] shadow-[0_24px_48px_-24px_rgba(15,23,42,0.18)] p-8 flex flex-col">
+                <p className="text-sm font-semibold text-blue-700 mb-4">Individual</p>
+                <p className="text-5xl font-semibold tracking-tight text-slate-900 mb-1">$19.99</p>
+                <p className="text-slate-500 text-sm mb-8">One-time payment · no subscription</p>
+                <Link href="/candidate/signup" className="btn-shimmer mt-auto text-white font-medium px-7 py-3.5 rounded-full text-[15px] text-center inline-flex items-center justify-center gap-2">
+                  Get Verified <span aria-hidden>→</span>
+                </Link>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={120}>
+              <div className="relative h-full rounded-[24px] bg-slate-950 border border-white/10 shadow-[0_30px_60px_-20px_rgba(30,58,138,0.55)] p-8 flex flex-col overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(70% 50% at 100% 0%, rgba(59,130,246,0.28) 0%, transparent 70%)" }} />
+                <p className="relative text-sm font-semibold text-blue-300 mb-4">Recruiter</p>
+                <p className="relative text-5xl font-semibold tracking-tight text-white mb-1">$199.99<span className="text-slate-400 text-lg font-normal ml-1.5">/month</span></p>
+                <p className="relative text-slate-500 text-sm mb-8">Billed monthly · account approval required</p>
+                <Link href="/employer/signup" className="relative mt-auto bg-white text-slate-900 font-medium px-7 py-3.5 rounded-full text-[15px] text-center inline-flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors shadow-lg">
+                  Start as a Recruiter <span aria-hidden>→</span>
+                </Link>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal className="text-center mt-8">
+            <Link href="/pricing" className="text-blue-700 font-medium text-[15px] hover:underline underline-offset-2">
+              Compare plans and FAQs →
+            </Link>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* ── CTA — photo backed ── */}
       <section className="relative py-24 sm:py-36 px-4 sm:px-6 overflow-hidden text-center bg-slate-950">
         <Image

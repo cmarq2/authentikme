@@ -49,6 +49,11 @@ export default function TermsPage() {
               paid. Accounts that signed up under a previous monthly plan continue to be billed under that
               plan until it is cancelled.
             </p>
+            <p className="mt-3">
+              Recruiter and employer accounts are offered on a recruiter plan of $199.99 USD per month,
+              billed monthly. Current pricing for all plans is shown on our{" "}
+              <Link href="/pricing" className="text-blue-600 hover:underline">pricing page</Link>.
+            </p>
           </section>
 
           <section>
