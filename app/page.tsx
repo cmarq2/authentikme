@@ -5,6 +5,7 @@ import CountUp from "./components/CountUp"
 import HeroVisual from "./components/HeroVisual"
 import HowItWorks from "./components/HowItWorks"
 import ComparisonSection from "./components/ComparisonSection"
+import ProcessVisual from "./components/ProcessVisual"
 import HeaderNav from "./components/HeaderNav"
 import SiteFooter from "./components/SiteFooter"
 
@@ -367,8 +368,11 @@ export default function Home() {
               <ScrollReveal key={item.num} delay={i * 140}>
                 <div className="process-card group relative h-full rounded-2xl p-8 overflow-hidden border border-white/[0.08] bg-white/[0.03] transition-all duration-500 hover:border-blue-400/30 hover:-translate-y-1">
                   <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-400/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <span className="block font-serif italic text-5xl text-blue-300/80 mb-8 leading-none">{item.num}</span>
-                  <h3 className="text-white font-semibold text-xl mb-3 tracking-tight">{item.title}</h3>
+                  <ProcessVisual step={i} />
+                  <div className="flex items-baseline gap-3 mb-3">
+                    <span className="font-serif italic text-3xl text-blue-300/80 leading-none">{item.num}</span>
+                    <h3 className="text-white font-semibold text-xl tracking-tight">{item.title}</h3>
+                  </div>
                   <p className="text-slate-400 text-[15px] leading-relaxed">{item.desc}</p>
                 </div>
               </ScrollReveal>
