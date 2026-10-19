@@ -23,6 +23,9 @@ export async function createVerificationCheckoutSession(
     payment_method_types: ["card"],
     mode: "payment",
     customer_creation: "always",
+    // Always charge in USD, wherever the customer is (e.g. India, Pakistan). Adaptive Pricing
+    // would otherwise show and charge a converted local-currency amount.
+    adaptive_pricing: { enabled: false },
     line_items: [
       VERIFICATION_PRICE_ID
         ? { price: VERIFICATION_PRICE_ID, quantity: 1 }
