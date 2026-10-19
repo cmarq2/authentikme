@@ -26,7 +26,7 @@ const panels: Record<AuthPanel, { image: string; alt: string; eyebrow: string; t
       "A verified badge employers trust before the first interview",
       "One unique code to share on every application",
       "Bank-grade 2FA and AI-screened government ID",
-      "One-time $19.99 fee — no subscription",
+      "One-time $12.99 fee — no subscription",
     ],
   },
   employer: {

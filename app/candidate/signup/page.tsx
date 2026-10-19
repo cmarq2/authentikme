@@ -176,7 +176,7 @@ export default function SignupPage() {
             and{" "}
             <Link href="/privacy" target="_blank" className="auth-link">Privacy Policy</Link>
             {accountType === "candidate"
-              ? ", including the one-time $19.99 verification fee charged when I complete the payment step."
+              ? ", including the one-time $12.99 verification fee charged when I complete the payment step."
               : "."}
           </label>
         </div>

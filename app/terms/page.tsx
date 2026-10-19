@@ -43,7 +43,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">3. Fees</h2>
             <p>
-              AuthentikMe Identity Verification is a one-time fee of $19.99 USD, charged once when you
+              AuthentikMe Identity Verification is a one-time fee of $12.99 USD, charged once when you
               complete the payment step of verification. There is no subscription and no recurring charge.
               Prices may change with notice posted to this page; any change does not affect fees already
               paid. Accounts that signed up under a previous monthly plan continue to be billed under that

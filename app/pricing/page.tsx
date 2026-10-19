@@ -6,7 +6,7 @@ import ScrollReveal from "../components/ScrollReveal"
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Simple, transparent pricing. Individuals get verified for a one-time $19.99. Recruiters verify candidates for $199.99 a month.",
+  description: "Simple, transparent pricing. Individuals get verified for a one-time $12.99. Recruiters verify candidates for $199.99 a month.",
   alternates: { canonical: "/pricing" },
 }
 
@@ -29,7 +29,7 @@ const recruiterFeatures = [
 const faqs = [
   {
     q: "Is the individual fee a subscription?",
-    a: "No. Individuals pay $19.99 once, when they complete the payment step of verification. There are no recurring charges.",
+    a: "No. Individuals pay $12.99 once, when they complete the payment step of verification. There are no recurring charges.",
   },
   {
     q: "How is the recruiter plan billed?",
@@ -84,7 +84,7 @@ export default function PricingPage() {
               <p className="text-slate-600 text-[15px] leading-relaxed mb-8">For candidates and contractors who want employers to trust them from the first application.</p>
 
               <div className="flex items-end gap-2 mb-1">
-                <span className="text-6xl font-semibold tracking-tight text-slate-900">$19.99</span>
+                <span className="text-6xl font-semibold tracking-tight text-slate-900">$12.99</span>
               </div>
               <p className="text-slate-500 text-sm mb-8">One-time payment · no subscription</p>
 

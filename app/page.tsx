@@ -416,7 +416,7 @@ export default function Home() {
             <ScrollReveal delay={0}>
               <div className="h-full rounded-[24px] bg-white border border-slate-900/[0.08] shadow-[0_24px_48px_-24px_rgba(15,23,42,0.18)] p-8 flex flex-col">
                 <p className="text-sm font-semibold text-blue-700 mb-4">Individual</p>
-                <p className="text-5xl font-semibold tracking-tight text-slate-900 mb-1">$19.99</p>
+                <p className="text-5xl font-semibold tracking-tight text-slate-900 mb-1">$12.99</p>
                 <p className="text-slate-500 text-sm mb-8">One-time payment · no subscription</p>
                 <Link href="/candidate/signup" className="btn-shimmer mt-auto text-white font-medium px-7 py-3.5 rounded-full text-[15px] text-center inline-flex items-center justify-center gap-2">
                   Get Verified <span aria-hidden>→</span>
