@@ -99,6 +99,38 @@ export async function sendEmployerApprovalRequestEmail(data: {
   })
 }
 
+// A legacy monthly subscription lives in the previous Stripe account, which the app's
+// current key can't reach — it has to be cancelled there by hand or it keeps billing.
+export async function sendLegacySubscriptionCancelEmail(data: {
+  email: string
+  name: string | null
+  stripeSubscriptionId: string
+}) {
+  const email = escapeHtml(data.email)
+  const name = escapeHtml(data.name ?? "—")
+  const subId = escapeHtml(data.stripeSubscriptionId)
+
+  await transporter.sendMail({
+    from: `"AuthentikMe" <${process.env.SMTP_USER}>`,
+    to: adminEmail(),
+    subject: `Action needed: cancel legacy subscription for ${data.email}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+        <div style="background:#1e3a8a;padding:16px 24px;border-radius:8px 8px 0 0;">
+          <h1 style="color:white;margin:0;font-size:20px;">AuthentikMe</h1>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-top:none;padding:32px;border-radius:0 0 8px 8px;">
+          <h2 style="color:#111827;margin-top:0;">A candidate cancelled a legacy monthly plan</h2>
+          <p style="color:#4b5563;margin:0 0 4px;"><strong>Name:</strong> ${name}</p>
+          <p style="color:#4b5563;margin:0 0 4px;"><strong>Email:</strong> ${email}</p>
+          <p style="color:#4b5563;margin:0 0 16px;"><strong>Subscription:</strong> ${subId}</p>
+          <p style="color:#4b5563;">Their account has been cancelled on AuthentikMe, but this subscription belongs to the previous Stripe account, so it was <strong>not</strong> cancelled in Stripe. Sign into that Stripe account and cancel it, or they will keep being charged.</p>
+        </div>
+      </div>
+    `,
+  })
+}
+
 export async function sendEmployerApprovedEmail(to: string, company: string) {
   await transporter.sendMail({
     from: `"AuthentikMe" <${process.env.SMTP_USER}>`,
