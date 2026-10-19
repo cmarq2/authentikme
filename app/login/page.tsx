@@ -1,15 +1,38 @@
 "use client"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import AuthShell from "../components/AuthShell"
 
+const PENDING_APPROVAL_MESSAGE =
+  "Your employer account is still awaiting approval. We'll email you as soon as it's reviewed."
+const REJECTED_MESSAGE =
+  "This employer account was not approved. Reply to our email or contact us if you think that's a mistake."
+
+function signInErrorMessage(error: string) {
+  if (error.includes("EMPLOYER_PENDING_APPROVAL")) return PENDING_APPROVAL_MESSAGE
+  if (error.includes("EMPLOYER_REJECTED")) return REJECTED_MESSAGE
+  return "Invalid email or password."
+}
+
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [error, setError] = useState(() => {
+    const initial = searchParams.get("error")
+    return initial ? signInErrorMessage(initial) : ""
+  })
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -26,7 +49,7 @@ export default function LoginPage() {
     setLoading(false)
 
     if (res?.error) {
-      setError("Invalid email or password.")
+      setError(signInErrorMessage(res.error))
       return
     }
 

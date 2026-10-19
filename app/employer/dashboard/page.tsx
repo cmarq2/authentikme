@@ -58,7 +58,10 @@ function DashboardInner() {
       body: JSON.stringify({ code: code.trim() }),
     })
 
-    const data: VerifyResult = await res.json()
+    const body = await res.json()
+    const data: VerifyResult = res.ok
+      ? body
+      : { verified: false, message: body.error || "Verification failed. Please try again." }
     setLoading(false)
     setResult(data)
 

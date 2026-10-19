@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
+import crypto from "crypto"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { getClientIp } from "@/lib/ip"
+import { sendEmployerApprovalRequestEmail } from "@/lib/email"
 
 export async function POST(req: Request) {
   const { name, company, email, password, agreedToTerms } = await req.json()
@@ -24,6 +26,7 @@ export async function POST(req: Request) {
   const hashedPassword = await bcrypt.hash(password, 12)
   const ip = getClientIp(req.headers)
   const now = new Date()
+  const approvalToken = crypto.randomBytes(32).toString("hex")
 
   await prisma.user.create({
     data: {
@@ -36,8 +39,26 @@ export async function POST(req: Request) {
       signupIp: ip,
       termsAcceptedAt: now,
       termsAcceptedIp: ip,
+      employerApprovalStatus: "PENDING",
+      employerApprovalToken: approvalToken,
     },
   })
 
-  return NextResponse.json({ message: "Employer account created. You can now log in." })
+  try {
+    await sendEmployerApprovalRequestEmail({
+      name,
+      company,
+      email: email.toLowerCase(),
+      signupIp: ip,
+      token: approvalToken,
+    })
+  } catch (err) {
+    // The account stays PENDING either way — log it so the request can be picked up manually.
+    console.error("employer/register: approval request email failed", err)
+  }
+
+  return NextResponse.json({
+    message: "Employer account submitted for approval. We'll email you once it's reviewed.",
+    pendingApproval: true,
+  })
 }

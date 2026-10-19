@@ -73,8 +73,8 @@ export default function SignupPage() {
   if (success) {
     return (
       <AuthSuccess
-        tone="success"
-        title={accountType === "candidate" ? "Check your email" : "Account created!"}
+        tone={accountType === "candidate" ? "success" : "pending"}
+        title={accountType === "candidate" ? "Check your email" : "Submitted for approval"}
         action={
           <Link href="/login" className="btn-shimmer inline-flex items-center gap-2 text-white font-medium px-8 py-3.5 rounded-full text-[15px]">
             Go to sign in <span aria-hidden>→</span>
@@ -83,7 +83,7 @@ export default function SignupPage() {
       >
         {accountType === "candidate"
           ? <>We sent a verification link to <strong className="text-slate-900 font-medium">{email}</strong>. Click it to continue your setup.</>
-          : <>Your employer account is ready. You can now sign in.</>}
+          : <>Employer accounts are reviewed manually before they can access candidate verification. We&apos;ll email <strong className="text-slate-900 font-medium">{email}</strong> as soon as your account is approved.</>}
       </AuthSuccess>
     )
   }

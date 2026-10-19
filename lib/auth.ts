@@ -23,6 +23,15 @@ export const authOptions: NextAuthOptions = {
         const passwordValid = await bcrypt.compare(credentials.password, user.password)
         if (!passwordValid) return null
 
+        // Employer accounts require manual admin approval before they can sign in.
+        if (user.role === "EMPLOYER" && user.employerApprovalStatus !== "APPROVED") {
+          throw new Error(
+            user.employerApprovalStatus === "REJECTED"
+              ? "EMPLOYER_REJECTED"
+              : "EMPLOYER_PENDING_APPROVAL"
+          )
+        }
+
         const headers = req?.headers as Record<string, string> | undefined
         const forwardedFor = headers?.["x-forwarded-for"]
         await prisma.loginEvent.create({
@@ -41,6 +50,7 @@ export const authOptions: NextAuthOptions = {
           company: user.company ?? undefined,
           emailVerified: user.emailVerified,
           totpEnabled: user.totpEnabled,
+          employerApproved: user.employerApprovalStatus === "APPROVED",
         }
       },
     }),
@@ -53,6 +63,7 @@ export const authOptions: NextAuthOptions = {
         token.company = (user as any).company
         token.emailVerified = (user as any).emailVerified
         token.totpEnabled = (user as any).totpEnabled
+        token.employerApproved = (user as any).employerApproved
       }
       if (trigger === "update" && session) {
         if (session.emailVerified !== undefined) token.emailVerified = session.emailVerified
@@ -67,6 +78,7 @@ export const authOptions: NextAuthOptions = {
         ;(session.user as any).company = token.company as string | undefined
         session.user.emailVerified = token.emailVerified as boolean
         session.user.totpEnabled = token.totpEnabled as boolean
+        session.user.employerApproved = token.employerApproved as boolean
       }
       return session
     },

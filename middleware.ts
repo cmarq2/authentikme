@@ -18,6 +18,11 @@ export default withAuth(
       return NextResponse.redirect(new URL("/candidate/dashboard", req.url))
     }
 
+    // Revoked/pending employers holding an older session token get bounced out.
+    if (pathname.startsWith("/employer/") && role === "EMPLOYER" && token.employerApproved === false) {
+      return NextResponse.redirect(new URL("/login?error=EMPLOYER_PENDING_APPROVAL", req.url))
+    }
+
     return NextResponse.next()
   },
   {

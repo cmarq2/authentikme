@@ -26,7 +26,7 @@ async function main() {
   // Employer — ready to log in and verify codes
   await prisma.user.upsert({
     where: { email: "employer@demo.com" },
-    update: {},
+    update: { employerApprovalStatus: "APPROVED" },
     create: {
       email: "employer@demo.com",
       name: "Demo Employer",
@@ -34,6 +34,8 @@ async function main() {
       password,
       role: "EMPLOYER",
       emailVerified: true,
+      employerApprovalStatus: "APPROVED",
+      employerApprovalDecidedAt: new Date(),
     },
   })
   console.log("✓ Demo employer created  — employer@demo.com / Demo1234!")

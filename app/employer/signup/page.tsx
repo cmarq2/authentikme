@@ -1,38 +1,62 @@
 "use client"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import AuthShell from "../../components/AuthShell"
+import AuthShell, { AuthSuccess } from "../../components/AuthShell"
 
 export default function EmployerSignupPage() {
-  const router = useRouter()
   const [name, setName] = useState("")
   const [company, setCompany] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+
+    if (!agreedToTerms) {
+      setError("You must agree to the Terms of Service to create an account.")
+      return
+    }
+
     setLoading(true)
 
     const res = await fetch("/api/employer/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, company, email, password }),
+      body: JSON.stringify({ name, company, email, password, agreedToTerms }),
     })
 
     const data = await res.json()
     setLoading(false)
 
     if (!res.ok) {
-      setError(data.error)
+      setError(data.error || "Something went wrong. Please try again.")
       return
     }
 
-    router.push("/login?registered=employer")
+    setSubmitted(true)
+  }
+
+  if (submitted) {
+    return (
+      <AuthSuccess
+        tone="pending"
+        title="Submitted for approval"
+        action={
+          <Link href="/" className="btn-shimmer inline-flex items-center gap-2 text-white font-medium px-8 py-3.5 rounded-full text-[15px]">
+            Back to site <span aria-hidden>→</span>
+          </Link>
+        }
+      >
+        Employer accounts are reviewed manually before they can access candidate
+        verification. We&apos;ll email <strong className="text-slate-900 font-medium">{email}</strong> as soon as your account is
+        approved.
+      </AuthSuccess>
+    )
   }
 
   return (
@@ -61,6 +85,24 @@ export default function EmployerSignupPage() {
           <input id="emp-password" type="password" required autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} className="auth-input" placeholder="At least 8 characters" />
         </div>
 
+        <div className="flex items-start gap-3">
+          <input id="agreedToTerms" type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="auth-checkbox" />
+          <label htmlFor="agreedToTerms" className="text-[13px] text-slate-600 leading-relaxed">
+            I agree to the{" "}
+            <Link href="/terms" target="_blank" className="auth-link">Terms of Service</Link>{" "}
+            and{" "}
+            <Link href="/privacy" target="_blank" className="auth-link">Privacy Policy</Link>
+            .
+          </label>
+        </div>
+
+        <div className="flex gap-3 rounded-xl border border-blue-500/15 bg-blue-50/60 px-4 py-3 text-[13px] text-slate-600 leading-relaxed">
+          <svg className="w-4 h-4 mt-0.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          Employer accounts are manually reviewed before activation. You&apos;ll receive an email once yours is approved.
+        </div>
+
         {error && <div className="auth-error">{error}</div>}
 
         <button
@@ -68,7 +110,7 @@ export default function EmployerSignupPage() {
           disabled={loading}
           className="w-full btn-shimmer text-white font-medium py-4 rounded-full text-[15px] disabled:opacity-60 disabled:pointer-events-none"
         >
-          {loading ? "Creating account…" : "Create employer account"}
+          {loading ? "Submitting…" : "Submit for approval"}
         </button>
       </form>
 

@@ -55,6 +55,90 @@ export async function sendContactFormEmail(data: {
   })
 }
 
+// Where employer approval requests are sent. Defaults to the mailbox the app already
+// sends from (noreply@authentikme.com) unless ADMIN_EMAIL overrides it.
+function adminEmail() {
+  return process.env.ADMIN_EMAIL || process.env.SMTP_USER
+}
+
+export async function sendEmployerApprovalRequestEmail(data: {
+  name: string
+  company: string
+  email: string
+  signupIp: string | null
+  token: string
+}) {
+  const reviewUrl = `${process.env.NEXTAUTH_URL}/admin/employer-approval?token=${data.token}`
+  const name = escapeHtml(data.name)
+  const company = escapeHtml(data.company)
+  const email = escapeHtml(data.email)
+  const ip = escapeHtml(data.signupIp ?? "unknown")
+
+  await transporter.sendMail({
+    from: `"AuthentikMe" <${process.env.SMTP_USER}>`,
+    to: adminEmail(),
+    replyTo: data.email,
+    subject: `Employer approval needed: ${data.company}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+        <div style="background:#1e3a8a;padding:16px 24px;border-radius:8px 8px 0 0;">
+          <h1 style="color:white;margin:0;font-size:20px;">AuthentikMe</h1>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-top:none;padding:32px;border-radius:0 0 8px 8px;">
+          <h2 style="color:#111827;margin-top:0;">New employer account awaiting approval</h2>
+          <p style="color:#4b5563;margin:0 0 4px;"><strong>Company:</strong> ${company}</p>
+          <p style="color:#4b5563;margin:0 0 4px;"><strong>Contact:</strong> ${name}</p>
+          <p style="color:#4b5563;margin:0 0 4px;"><strong>Email:</strong> ${email}</p>
+          <p style="color:#4b5563;margin:0 0 16px;"><strong>Signup IP:</strong> ${ip}</p>
+          <p style="color:#4b5563;">They cannot sign in until you approve them. Open the review page to approve or reject:</p>
+          <a href="${reviewUrl}" style="display:inline-block;background:#2563eb;color:white;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;margin:16px 0;">Review This Employer</a>
+          <p style="color:#9ca3af;font-size:13px;margin-top:24px;">This link is private — anyone with it can approve or reject this one account.</p>
+        </div>
+      </div>
+    `,
+  })
+}
+
+export async function sendEmployerApprovedEmail(to: string, company: string) {
+  await transporter.sendMail({
+    from: `"AuthentikMe" <${process.env.SMTP_USER}>`,
+    to,
+    subject: "Your employer account is approved – AuthentikMe",
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+        <div style="background:#1e3a8a;padding:16px 24px;border-radius:8px 8px 0 0;">
+          <h1 style="color:white;margin:0;font-size:20px;">AuthentikMe</h1>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-top:none;padding:32px;border-radius:0 0 8px 8px;">
+          <h2 style="color:#111827;margin-top:0;">You're approved</h2>
+          <p style="color:#4b5563;">The employer account for <strong>${escapeHtml(company)}</strong> has been approved. You can now sign in and start verifying candidate codes.</p>
+          <a href="${process.env.NEXTAUTH_URL}/login" style="display:inline-block;background:#2563eb;color:white;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:600;margin:16px 0;">Sign In</a>
+        </div>
+      </div>
+    `,
+  })
+}
+
+export async function sendEmployerRejectedEmail(to: string, company: string) {
+  await transporter.sendMail({
+    from: `"AuthentikMe" <${process.env.SMTP_USER}>`,
+    to,
+    subject: "Update on your AuthentikMe employer application",
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+        <div style="background:#1e3a8a;padding:16px 24px;border-radius:8px 8px 0 0;">
+          <h1 style="color:white;margin:0;font-size:20px;">AuthentikMe</h1>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-top:none;padding:32px;border-radius:0 0 8px 8px;">
+          <h2 style="color:#111827;margin-top:0;">We couldn't approve this account</h2>
+          <p style="color:#4b5563;">Thanks for your interest in AuthentikMe. We weren't able to approve the employer account for <strong>${escapeHtml(company)}</strong> at this time.</p>
+          <p style="color:#4b5563;">If you believe this was a mistake, reply to this email and we'll take another look.</p>
+        </div>
+      </div>
+    `,
+  })
+}
+
 export async function sendVerificationEmail(to: string, token: string) {
   const verifyUrl = `${process.env.NEXTAUTH_URL}/candidate/verify-email?token=${token}`
   await transporter.sendMail({

@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/candidate/dashboard", "/employer/dashboard"],
+      disallow: ["/api/", "/admin/", "/candidate/dashboard", "/employer/dashboard"],
     },
     sitemap: "https://www.authentikme.com/sitemap.xml",
   }

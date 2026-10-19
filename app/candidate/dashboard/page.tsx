@@ -1171,6 +1171,7 @@ function SettingsTab({ userStatus, onStatusChange }: { userStatus: Status; onSta
                 <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
                   <p className="text-sm font-semibold text-red-800">Are you sure?</p>
                   <p className="text-xs text-red-600 mt-0.5">Your verification badge and ATK code will stop working immediately. You can resubscribe at any time.</p>
+                  <p className="text-xs text-red-600 mt-2">If an employer hasn't checked your code yet, cancelling now means they won't be able to see your Qualified status. We recommend keeping your subscription active for at least a week or two after applying, so employers have time to verify you.</p>
                 </div>
                 {cancelError && <p className="text-xs text-red-600">{cancelError}</p>}
                 <div className="flex gap-2">

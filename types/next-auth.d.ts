@@ -7,6 +7,7 @@ declare module "next-auth" {
     role: string
     emailVerified: boolean
     totpEnabled: boolean
+    employerApproved?: boolean
   }
   interface Session {
     user: {
@@ -16,6 +17,7 @@ declare module "next-auth" {
       role: string
       emailVerified: boolean
       totpEnabled: boolean
+      employerApproved?: boolean
     }
   }
 }
@@ -26,5 +28,6 @@ declare module "next-auth/jwt" {
     role: string
     emailVerified: boolean
     totpEnabled: boolean
+    employerApproved?: boolean
   }
 }

@@ -13,6 +13,17 @@ export async function POST(req: Request) {
   if (!user || user.role !== "EMPLOYER") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
+  if (user.employerApprovalStatus !== "APPROVED") {
+    return NextResponse.json(
+      {
+        error:
+          user.employerApprovalStatus === "REJECTED"
+            ? "This employer account is not approved for candidate verification."
+            : "This employer account is awaiting approval.",
+      },
+      { status: 403 }
+    )
+  }
 
   const { code } = await req.json()
   if (!code) {
